@@ -319,6 +319,140 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/13/Ubuntu16-04-Grub-Rescue/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Nutao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Nutao">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/07/13/Ubuntu16-04-Grub-Rescue/" itemprop="url">Ubuntu16.04 Grub Rescue</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-13T23:49:08+08:00">
+                2017-07-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>如果某一天, 你不小心扩展了一下你的 / 目录, 又忘记了更新 grub 引导. 不好意思, 你有麻烦了</p>
+<h3 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h3><h4 id="1-ls-一下所有的盘符"><a href="#1-ls-一下所有的盘符" class="headerlink" title="1. ls 一下所有的盘符"></a>1. ls 一下所有的盘符</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">grub rescue&gt; ls</div></pre></td></tr></table></figure>
+<h4 id="2-找-boot-grub的分区"><a href="#2-找-boot-grub的分区" class="headerlink" title="2. 找/boot/grub的分区"></a>2. 找/boot/grub的分区</h4><blockquote>
+<p>如果你的 /boot 没有单独分区, 请执行</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">grub rescue&gt; ls (hd0,msdosx)/boot/grub</div></pre></td></tr></table></figure>
+<blockquote>
+<p>如果你的 /boot 单独分区啦, 请执行</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">grub rescue&gt; ls (hd0,msdosx)/grub</div></pre></td></tr></table></figure>
+<p>ls出如下的目录, 恭喜你找到 /boot 路径了</p>
+<h4 id="3-修复grub引导"><a href="#3-修复grub引导" class="headerlink" title="3. 修复grub引导"></a>3. 修复grub引导</h4><blockquote>
+<p>假设/boot 在(hd0,msdos3) 中</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"># /boot 单独分区</div><div class="line">set root=(hd0,msdos3)</div><div class="line">set prefix=(hd0,msdos3)/grub</div><div class="line">insmod normal</div><div class="line">normal</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"># /boot 没有单独分区</div><div class="line">set root=(hd0,msdos3)</div><div class="line">set prefix=(hd0,msdos3)/boot/grub</div><div class="line">insmod normal</div><div class="line">normal</div></pre></td></tr></table></figure>
+<p>正常情况下, 执行完后, 电脑就能开机进入桌面啦<br>然后, 还没有结束. (这时千万不要关机, 否则前面步骤再来一次)<br><strong>在正常进入系统以后…</strong></p>
+<h4 id="4-更新系统-grub-引导"><a href="#4-更新系统-grub-引导" class="headerlink" title="4. 更新系统 grub 引导"></a>4. 更新系统 grub 引导</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo update-grub</div><div class="line">sudo update-grub2</div></pre></td></tr></table></figure>
+<blockquote>
+<p>打印出如下日志(我是双系统)<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Generating grub configuration file ...</div><div class="line">Found linux image: /boot/vmlinuz-4.4.0-66-generic</div><div class="line">Found initrd image: /boot/initrd.img-4.4.0-66-generic</div><div class="line">Found memtest86+ image: /memtest86+.elf</div><div class="line">Found memtest86+ image: /memtest86+.bin</div><div class="line">Found Windows 10 (loader) on /dev/sda1</div><div class="line"><span class="keyword">done</span></div></pre></td></tr></table></figure></p>
+<p>然后重新安装grub</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">nutao@nutao-HP:~$ sudo grub-install /dev/sda</div><div class="line"># 日志</div><div class="line">Installing for i386-pc platform.</div><div class="line">Installation finished. No error reported.</div></pre></td></tr></table></figure>
+<h4 id="OK-一切搞定"><a href="#OK-一切搞定" class="headerlink" title="OK, 一切搞定"></a>OK, 一切搞定</h4>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/13/hello-world/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -476,7 +610,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-count">2</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -484,6 +618,15 @@
 
           
 
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
           
 
         </nav>

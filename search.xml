@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[Ubuntu16.04 Grub Rescue]]></title>
+    <url>%2F2017%2F07%2F13%2FUbuntu16-04-Grub-Rescue%2F</url>
+    <content type="text"><![CDATA[如果某一天, 你不小心扩展了一下你的 / 目录, 又忘记了更新 grub 引导. 不好意思, 你有麻烦了 解决办法1. ls 一下所有的盘符1grub rescue&gt; ls 2. 找/boot/grub的分区 如果你的 /boot 没有单独分区, 请执行 1grub rescue&gt; ls (hd0,msdosx)/boot/grub 如果你的 /boot 单独分区啦, 请执行 1grub rescue&gt; ls (hd0,msdosx)/grub ls出如下的目录, 恭喜你找到 /boot 路径了 3. 修复grub引导 假设/boot 在(hd0,msdos3) 中 12345# /boot 单独分区set root=(hd0,msdos3)set prefix=(hd0,msdos3)/grubinsmod normalnormal 12345# /boot 没有单独分区set root=(hd0,msdos3)set prefix=(hd0,msdos3)/boot/grubinsmod normalnormal 正常情况下, 执行完后, 电脑就能开机进入桌面啦然后, 还没有结束. (这时千万不要关机, 否则前面步骤再来一次)在正常进入系统以后… 4. 更新系统 grub 引导12sudo update-grubsudo update-grub2 打印出如下日志(我是双系统)1234567Generating grub configuration file ...Found linux image: /boot/vmlinuz-4.4.0-66-genericFound initrd image: /boot/initrd.img-4.4.0-66-genericFound memtest86+ image: /memtest86+.elfFound memtest86+ image: /memtest86+.binFound Windows 10 (loader) on /dev/sda1done 然后重新安装grub 1234nutao@nutao-HP:~$ sudo grub-install /dev/sda# 日志Installing for i386-pc platform.Installation finished. No error reported. OK, 一切搞定]]></content>
+      <tags>
+        <tag>Ubuntu</tag>
+        <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[Hello World]]></title>
     <url>%2F2017%2F07%2F13%2Fhello-world%2F</url>
     <content type="text"><![CDATA[Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick StartCreate a new post1$ hexo new "My New Post" More info: Writing Run server1$ hexo server More info: Server Generate static files1$ hexo generate More info: Generating Deploy to remote sites1$ hexo deploy More info: Deployment]]></content>
