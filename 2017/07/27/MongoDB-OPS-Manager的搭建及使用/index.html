@@ -100,10 +100,10 @@
 <meta property="og:url" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/index.html">
 <meta property="og:site_name" content="Nutao">
 <meta property="og:description" content="MongoDB OPS Manager 是用于管理MongoDB集群和部署的工具。 通过MMS可以大大简化MongDB的管理部署。">
-<meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/.1498742983255.png">
-<meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/.1498743011857.png">
-<meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/.1498743284588.png">
-<meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/.1498748179964.png">
+<meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/1498742983255.png">
+<meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/1498743011857.png">
+<meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/1498743284588.png">
+<meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/1498748179964.png">
 <meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/1498553286879.png">
 <meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/1498552789799.png">
 <meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/1498553991402.png">
@@ -112,11 +112,11 @@
 <meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/1498554906062.png">
 <meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/1498555116067.png">
 <meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/.1498743360554.png">
-<meta property="og:updated_time" content="2017-07-27T11:19:42.693Z">
+<meta property="og:updated_time" content="2017-07-27T11:22:03.210Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MongoDB OPS Manager的搭建及使用">
 <meta name="twitter:description" content="MongoDB OPS Manager 是用于管理MongoDB集群和部署的工具。 通过MMS可以大大简化MongDB的管理部署。">
-<meta name="twitter:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/.1498742983255.png">
+<meta name="twitter:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/1498742983255.png">
 
 
 
@@ -445,10 +445,10 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">always madvise [never]</div></pre></td></tr></table></figure>
 <h2 id="3-安装MongoDB-每台机器上"><a href="#3-安装MongoDB-每台机器上" class="headerlink" title="3. 安装MongoDB(每台机器上)"></a>3. 安装MongoDB(每台机器上)</h2><p><a href="https://www.evernote.com/shard/s665/sh/68b601b3-9fea-46df-9438-8de0f3f83580/50cb5a61f1fa144e79dc93191fdf9ddd" target="_blank" rel="external"><strong>我的笔记-NoSQL-MongoDB单机部署</strong></a></p>
 <p><a href="https://mirrors.tuna.tsinghua.edu.cn/help/mongodb/" target="_blank" rel="external"><strong>使用TUNA源安装MongoDB</strong></a></p>
-<h4 id="配置ReplicatSet副本"><a href="#配置ReplicatSet副本" class="headerlink" title="配置ReplicatSet副本"></a>配置ReplicatSet副本</h4><p>ReplicatSet结构如下<br><img src="/2017/07/27/MongoDB-OPS-Manager的搭建及使用/.1498742983255.png" alt="Alt text"></p>
-<p>Primary Node将自己的数据同步到Secondary Node<br><img src="/2017/07/27/MongoDB-OPS-Manager的搭建及使用/.1498743011857.png" alt="Alt text"></p>
+<h4 id="配置ReplicatSet副本"><a href="#配置ReplicatSet副本" class="headerlink" title="配置ReplicatSet副本"></a>配置ReplicatSet副本</h4><p>ReplicatSet结构如下<br><img src="/2017/07/27/MongoDB-OPS-Manager的搭建及使用/1498742983255.png" alt="Alt text"></p>
+<p>Primary Node将自己的数据同步到Secondary Node<br><img src="/2017/07/27/MongoDB-OPS-Manager的搭建及使用/1498743011857.png" alt="Alt text"></p>
 <p>一旦primary Node挂了，或者10s内无法取得Heartbeat，Secondary Node会选举新的Primary Node</p>
-<p><img src="/2017/07/27/MongoDB-OPS-Manager的搭建及使用/.1498743284588.png" alt="Alt text"></p>
+<p><img src="/2017/07/27/MongoDB-OPS-Manager的搭建及使用/1498743284588.png" alt="Alt text"></p>
 <h4 id="ALL-修改配置文件-最好自建"><a href="#ALL-修改配置文件-最好自建" class="headerlink" title="[ALL]修改配置文件(最好自建)"></a>[ALL]修改配置文件(最好自建)</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 默认mongodb.conf在 /etc/mongodb.conf</span></div><div class="line">vim  /home/cisdi/DBTEST/mongodb/mongod.conf</div></pre></td></tr></table></figure>
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># for documentation of all options, see:</span></div><div class="line"><span class="comment">#   http://docs.mongodb.org/manual/reference/configuration-options/</span></div><div class="line"></div><div class="line"><span class="comment"># Where and how to store data.</span></div><div class="line"><span class="attr">storage:</span></div><div class="line"><span class="attr">  dbPath:</span> <span class="string">/home/cisdi/DBTEST/mongodb/data</span></div><div class="line"><span class="attr">  journal:</span></div><div class="line"><span class="attr">    enabled:</span> <span class="literal">true</span></div><div class="line"><span class="comment">#  engine:</span></div><div class="line"><span class="comment">#  mmapv1:</span></div><div class="line"><span class="comment">#  wiredTiger:</span></div><div class="line"></div><div class="line"><span class="comment"># where to write logging data.</span></div><div class="line"><span class="attr">systemLog:</span></div><div class="line"><span class="attr">  destination:</span> <span class="string">file</span></div><div class="line"><span class="attr">  logAppend:</span> <span class="literal">true</span></div><div class="line"><span class="attr">  path:</span> <span class="string">/home/cisdi/DBTEST/mongodb/log/mongodb.log</span></div><div class="line"></div><div class="line"><span class="comment"># network interfaces</span></div><div class="line"><span class="attr">net:</span></div><div class="line"><span class="attr">  port:</span> <span class="number">27018</span></div><div class="line"> <span class="comment"># bindIp: 127.0.0.1</span></div><div class="line"></div><div class="line"><span class="attr">processManagement:</span></div><div class="line"><span class="attr">  fork:</span> <span class="literal">true</span></div><div class="line"><span class="comment">#security:</span></div><div class="line"><span class="comment">#operationProfiling:</span></div><div class="line"></div><div class="line"><span class="comment"># 副本</span></div><div class="line"><span class="attr">replication:</span></div><div class="line"><span class="attr">  replSetName:</span> <span class="string">ops_manager</span></div><div class="line"><span class="comment">#sharding:</span></div><div class="line"><span class="comment">## Enterprise-Only Options:</span></div><div class="line"><span class="comment">#auditLog:</span></div><div class="line"><span class="comment">#snmp:</span></div></pre></td></tr></table></figure>
 <p>[<strong><code>ALL</code></strong>]启动MongoDB</p>
@@ -478,7 +478,7 @@
 <h4 id="配置MongoDB集群"><a href="#配置MongoDB集群" class="headerlink" title="配置MongoDB集群"></a>配置MongoDB集群</h4><blockquote>
 <p>Cluster架构设计</p>
 </blockquote>
-<p><img src="/2017/07/27/MongoDB-OPS-Manager的搭建及使用/.1498748179964.png" alt="Alt text"></p>
+<p><img src="/2017/07/27/MongoDB-OPS-Manager的搭建及使用/1498748179964.png" alt="Alt text"></p>
 <blockquote>
 <p>下载相关版本的 MongoDB</p>
 </blockquote>
