@@ -93,13 +93,13 @@
 
 
 
-<meta name="description" content="1.介绍MongoDB OPS Manager 是用于管理MongoDB集群和部署的工具。 通过MMS可以大大简化MongDB的管理部署。 三台机器 (注意修改hosts)  master node1 node2">
+<meta name="description" content="MongoDB OPS Manager 是用于管理MongoDB集群和部署的工具。 通过MMS可以大大简化MongDB的管理部署。">
 <meta name="keywords" content="Ubuntu,Linux,MongoDB">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MongoDB OPS Manager的搭建及使用">
 <meta property="og:url" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/index.html">
 <meta property="og:site_name" content="Nutao">
-<meta property="og:description" content="1.介绍MongoDB OPS Manager 是用于管理MongoDB集群和部署的工具。 通过MMS可以大大简化MongDB的管理部署。 三台机器 (注意修改hosts)  master node1 node2">
+<meta property="og:description" content="MongoDB OPS Manager 是用于管理MongoDB集群和部署的工具。 通过MMS可以大大简化MongDB的管理部署。">
 <meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/.1498742983255.png">
 <meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/.1498743011857.png">
 <meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/.1498743284588.png">
@@ -112,10 +112,10 @@
 <meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/1498554906062.png">
 <meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/1498555116067.png">
 <meta property="og:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/.1498743360554.png">
-<meta property="og:updated_time" content="2017-07-27T11:15:00.823Z">
+<meta property="og:updated_time" content="2017-07-27T11:18:59.125Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MongoDB OPS Manager的搭建及使用">
-<meta name="twitter:description" content="1.介绍MongoDB OPS Manager 是用于管理MongoDB集群和部署的工具。 通过MMS可以大大简化MongDB的管理部署。 三台机器 (注意修改hosts)  master node1 node2">
+<meta name="twitter:description" content="MongoDB OPS Manager 是用于管理MongoDB集群和部署的工具。 通过MMS可以大大简化MongDB的管理部署。">
 <meta name="twitter:image" content="http://yoursite.com/2017/07/27/MongoDB-OPS-Manager的搭建及使用/.1498742983255.png">
 
 
@@ -423,14 +423,14 @@
       
 
       
-        <h2 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1.介绍"></a>1.介绍</h2><p>MongoDB OPS Manager 是用于管理MongoDB集群和部署的工具。 通过MMS可以大大简化MongDB的管理部署。</p>
-<p><strong>三台机器 (注意修改hosts)</strong></p>
+        <p>MongoDB OPS Manager 是用于管理MongoDB集群和部署的工具。 通过MMS可以大大简化MongDB的管理部署。</p>
+<a id="more"></a>
+<h2 id="1-机器"><a href="#1-机器" class="headerlink" title="1.机器"></a>1.机器</h2><p><strong>三台机器 (注意修改hosts)</strong></p>
 <ul>
 <li>master</li>
 <li>node1</li>
 <li>node2</li>
 </ul>
-<a id="more"></a>
 <h2 id="２-安装前准备-ALL"><a href="#２-安装前准备-ALL" class="headerlink" title="２.安装前准备[ALL]"></a>２.安装前准备[ALL]</h2><h4 id="NUMA-Settings"><a href="#NUMA-Settings" class="headerlink" title="NUMA Settings"></a>NUMA Settings</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sysctl -w vm.zone_reclaim_mode=0</div></pre></td></tr></table></figure>
 <h4 id="NTP-Settings"><a href="#NTP-Settings" class="headerlink" title="NTP Settings"></a>NTP Settings</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo apt install -y ntp</div><div class="line">service ntp start</div></pre></td></tr></table></figure>
 <h4 id="Turn-off-Atime"><a href="#Turn-off-Atime" class="headerlink" title="Turn off Atime"></a>Turn off Atime</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt; vim /etc/fstab</div><div class="line">/dev/mapper/VolGroup-lv_data /data  ext4 defaults,noatime,nodiratime  1 1</div></pre></td></tr></table></figure>
@@ -746,7 +746,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-介绍"><span class="nav-number">1.</span> <span class="nav-text">1.介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#２-安装前准备-ALL"><span class="nav-number">2.</span> <span class="nav-text">２.安装前准备[ALL]</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NUMA-Settings"><span class="nav-number">2.0.1.</span> <span class="nav-text">NUMA Settings</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NTP-Settings"><span class="nav-number">2.0.2.</span> <span class="nav-text">NTP Settings</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Turn-off-Atime"><span class="nav-number">2.0.3.</span> <span class="nav-text">Turn off Atime</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ulimt-settings"><span class="nav-number">2.0.4.</span> <span class="nav-text">ulimt settings</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Disable-Transparent-Huge-Pages"><span class="nav-number">2.0.5.</span> <span class="nav-text">Disable Transparent Huge Pages</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-安装MongoDB-每台机器上"><span class="nav-number">3.</span> <span class="nav-text">3. 安装MongoDB(每台机器上)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置ReplicatSet副本"><span class="nav-number">3.0.1.</span> <span class="nav-text">配置ReplicatSet副本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ALL-修改配置文件-最好自建"><span class="nav-number">3.0.2.</span> <span class="nav-text">[ALL]修改配置文件(最好自建)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-安装OPS-Manager-ONE"><span class="nav-number">4.</span> <span class="nav-text">4. 安装OPS Manager[ONE]</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#修改OPS-Manager-配置文件"><span class="nav-number">4.0.1.</span> <span class="nav-text">修改OPS Manager 配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动-MMS"><span class="nav-number">4.0.2.</span> <span class="nav-text">启动 MMS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置MongoDB集群"><span class="nav-number">4.0.3.</span> <span class="nav-text">配置MongoDB集群</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#５．通过Mongos连接到集群"><span class="nav-number">5.</span> <span class="nav-text">５．通过Mongos连接到集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#６-可能遇到的Bug"><span class="nav-number">6.</span> <span class="nav-text">６. 可能遇到的Bug</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-参考文献"><span class="nav-number">7.</span> <span class="nav-text">7. 参考文献</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-机器"><span class="nav-number">1.</span> <span class="nav-text">1.机器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#２-安装前准备-ALL"><span class="nav-number">2.</span> <span class="nav-text">２.安装前准备[ALL]</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NUMA-Settings"><span class="nav-number">2.0.1.</span> <span class="nav-text">NUMA Settings</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NTP-Settings"><span class="nav-number">2.0.2.</span> <span class="nav-text">NTP Settings</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Turn-off-Atime"><span class="nav-number">2.0.3.</span> <span class="nav-text">Turn off Atime</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ulimt-settings"><span class="nav-number">2.0.4.</span> <span class="nav-text">ulimt settings</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Disable-Transparent-Huge-Pages"><span class="nav-number">2.0.5.</span> <span class="nav-text">Disable Transparent Huge Pages</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-安装MongoDB-每台机器上"><span class="nav-number">3.</span> <span class="nav-text">3. 安装MongoDB(每台机器上)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置ReplicatSet副本"><span class="nav-number">3.0.1.</span> <span class="nav-text">配置ReplicatSet副本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ALL-修改配置文件-最好自建"><span class="nav-number">3.0.2.</span> <span class="nav-text">[ALL]修改配置文件(最好自建)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-安装OPS-Manager-ONE"><span class="nav-number">4.</span> <span class="nav-text">4. 安装OPS Manager[ONE]</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#修改OPS-Manager-配置文件"><span class="nav-number">4.0.1.</span> <span class="nav-text">修改OPS Manager 配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动-MMS"><span class="nav-number">4.0.2.</span> <span class="nav-text">启动 MMS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置MongoDB集群"><span class="nav-number">4.0.3.</span> <span class="nav-text">配置MongoDB集群</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#５．通过Mongos连接到集群"><span class="nav-number">5.</span> <span class="nav-text">５．通过Mongos连接到集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#６-可能遇到的Bug"><span class="nav-number">6.</span> <span class="nav-text">６. 可能遇到的Bug</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-参考文献"><span class="nav-number">7.</span> <span class="nav-text">7. 参考文献</span></a></li></ol></div>
             
 
           </div>
