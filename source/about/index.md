@@ -8,6 +8,6 @@ tags: nutao
 Nutao
 
 ## Contact
-**Email**: chengzhengguo123@gmail.com
+**Email**: chengzhengguo123@qq.com
 **知乎专栏**: <a href="https://zhuanlan.zhihu.com/ubuntu-learn">Ubuntu中的那些事儿</a>
 **我的简历**:<a href="http://nutaocv.azurewebsites.net/ ">我的简历</a>
