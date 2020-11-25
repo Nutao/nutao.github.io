@@ -12,6 +12,11 @@ Nutao的个人博客
 - master分支：静态Pages
 - backup分支：hexo + Next + Post 文档
 
+## 快速恢复环境
+
+```shell
+sh init-env.sh
+```
 
 ## Hexo 相关
 ```shell

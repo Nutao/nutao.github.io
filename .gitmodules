@@ -1,0 +1,4 @@
+[submodule "themes/next"]
+    path = themes/next
+    url = https://gitee.com/nutao/hexo-theme-next.git
+    branch = master
