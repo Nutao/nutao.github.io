@@ -14,6 +14,12 @@ Nutao的个人博客
 
 ## 快速恢复环境
 
+环境依赖：
+- node、npm 最新
+- hexo 6.3.0
+
+具体适配版本见：https://hexo.io/docs/#Required-Node-js-version
+
 ```shell
 sh init-env.sh
 ```
