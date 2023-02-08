@@ -99,15 +99,15 @@ theme: next
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: git@gitee.com:nutao/nutao.git
+  repo: git@github.com:Nutao/nutao.github.io.git
   branch: master
 
 backup:
     type: git
     theme: next
-    message: Back up nutao.gitee.io source
+    message: Back up page source
     repository:
-      git: git@gitee.com:nutao/nutao.git, backup
+      git: git@github.com:Nutao/nutao.github.io.git, backup
   
 search:
   path: search.xml

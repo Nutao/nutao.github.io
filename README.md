@@ -5,7 +5,7 @@ Nutao的个人博客
 基于开源框架 `Hexo + Next`
 
 # 地址
-- github地址： https://nutao.github.io (已迁移至码云)
+- github地址： https://nutao.github.io (最新)
 - gitee地址：  https://nutao.gitee.io
 
 ## 仓库相关
