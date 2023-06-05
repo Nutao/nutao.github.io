@@ -20,7 +20,8 @@ npm install
 npm install hexo-deployer-git --save
 
 # download theme
-git submodule init && git submodule update --remote
+# git submodule init && git submodule update --remote
+git clone https://gitee.com/nutao/hexo-theme-next.git themes/next
 
 # configuratin
 cp ./themes/_config.yml themes/next/_config.yml
