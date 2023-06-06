@@ -1,49 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Docker-容器抓包</title>
-    <url>/2020/04/06/Docker-%E5%AE%B9%E5%99%A8%E6%8A%93%E5%8C%85/</url>
-    <content><![CDATA[<p>通常情况下，Linux可以通过tcpdump工具进行抓包。但是，在容器服务日趋盛行的今天，制品base镜像为减小体积，仅会包含必要的核心库和工具。给PaaS服务中容器的网络问题和定位，则需要通过名为 <code>nsenter</code> 的工具实现。</p>
-<span id="more"></span>
-
-
-<h2 id="nsenter简介"><a href="#nsenter简介" class="headerlink" title="nsenter简介"></a>nsenter简介</h2><p>nsenter 包含在绝大部分 Linux 发行版预置的 <code>util-linux</code> 工具包中。它可以进入指定进程的关联命名空间。包括</p>
-<ul>
-<li>文件命名空间（mount namespace）</li>
-<li>主机名命名空间（UTS namespace)</li>
-<li>IPC 命名空间（IPC namespace）</li>
-<li>网络命名空间（network namespace）</li>
-<li>进程命名空间（pid namespace）</li>
-<li>用户命名空间（user namespace）。</li>
-</ul>
-<p>通过进入到指定的命名空间，即可实现在宿主机shell中直接操作指定容器的网络接口，并进行抓包等操作。</p>
-<h2 id="使用nsenter抓包"><a href="#使用nsenter抓包" class="headerlink" title="使用nsenter抓包"></a>使用nsenter抓包</h2><ol>
-<li>获取容器Pid</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker inspect --format &quot;&#123;&#123;.State.Pid&#125;&#125;&quot; &lt;container id/name&gt;</span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li>切换当前shell的网络命名空间为指定容器网络命名空间</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-n 表示切换网络命名空间，-t 指定的 pid 为步骤 1 获取的容器的 root pid：</span></span><br><span class="line">nsenter -n -t &lt;container root id&gt;</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li>使用tcpdump对容器网络接口抓包</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-i指定网卡，示例为抓取80/tcp相关的包</span></span><br><span class="line">tcpdump -i eth0 tcp and port 80 -vvv</span><br></pre></td></tr></table></figure>
-
-
-<p>更多的nsenter使用，可以参考 <code>man nsenter</code>查阅工具的使用指南。</p>
-]]></content>
-      <categories>
-        <category>Docker</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>Docker</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>GIT开发流程梳理</title>
     <url>/2023/02/08/GIT%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86/</url>
     <content><![CDATA[<h1 id="1-目的"><a href="#1-目的" class="headerlink" title="1. 目的"></a>1. 目的</h1><p>为了有效的帮助团队更简洁，更统一的管理好源码。</p>
@@ -156,6 +113,49 @@
       </categories>
       <tags>
         <tag>git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Docker-容器抓包</title>
+    <url>/2020/04/06/Docker-%E5%AE%B9%E5%99%A8%E6%8A%93%E5%8C%85/</url>
+    <content><![CDATA[<p>通常情况下，Linux可以通过tcpdump工具进行抓包。但是，在容器服务日趋盛行的今天，制品base镜像为减小体积，仅会包含必要的核心库和工具。给PaaS服务中容器的网络问题和定位，则需要通过名为 <code>nsenter</code> 的工具实现。</p>
+<span id="more"></span>
+
+
+<h2 id="nsenter简介"><a href="#nsenter简介" class="headerlink" title="nsenter简介"></a>nsenter简介</h2><p>nsenter 包含在绝大部分 Linux 发行版预置的 <code>util-linux</code> 工具包中。它可以进入指定进程的关联命名空间。包括</p>
+<ul>
+<li>文件命名空间（mount namespace）</li>
+<li>主机名命名空间（UTS namespace)</li>
+<li>IPC 命名空间（IPC namespace）</li>
+<li>网络命名空间（network namespace）</li>
+<li>进程命名空间（pid namespace）</li>
+<li>用户命名空间（user namespace）。</li>
+</ul>
+<p>通过进入到指定的命名空间，即可实现在宿主机shell中直接操作指定容器的网络接口，并进行抓包等操作。</p>
+<h2 id="使用nsenter抓包"><a href="#使用nsenter抓包" class="headerlink" title="使用nsenter抓包"></a>使用nsenter抓包</h2><ol>
+<li>获取容器Pid</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker inspect --format &quot;&#123;&#123;.State.Pid&#125;&#125;&quot; &lt;container id/name&gt;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>切换当前shell的网络命名空间为指定容器网络命名空间</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-n 表示切换网络命名空间，-t 指定的 pid 为步骤 1 获取的容器的 root pid：</span></span><br><span class="line">nsenter -n -t &lt;container root id&gt;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>使用tcpdump对容器网络接口抓包</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-i指定网卡，示例为抓取80/tcp相关的包</span></span><br><span class="line">tcpdump -i eth0 tcp and port 80 -vvv</span><br></pre></td></tr></table></figure>
+
+
+<p>更多的nsenter使用，可以参考 <code>man nsenter</code>查阅工具的使用指南。</p>
+]]></content>
+      <categories>
+        <category>Docker</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Docker</tag>
       </tags>
   </entry>
   <entry>
@@ -931,6 +931,70 @@
       </tags>
   </entry>
   <entry>
+    <title>Ubuntu 换源，安装&amp;卸载软件</title>
+    <url>/2017/07/17/Ubuntu-%E6%8D%A2%E6%BA%90%EF%BC%8C%E5%AE%89%E8%A3%85-%E5%8D%B8%E8%BD%BD%E8%BD%AF%E4%BB%B6/</url>
+    <content><![CDATA[<p>国内的筒子们，经常发现在update的时候各种卡。。。有时候心情好，等等也就罢了。万一某一天急着安装软件，那种状态下，真的是多等一秒感觉都是心烦气躁的。所以，本文就来跟大家聊聊在Ubuntu 中换源，安装&amp;卸载软件的那些事，欢迎各位一起交流。。。<br><img src="/images/ubuntu16.04.png" alt="Ubuntu16.04"></p>
+<span id="more"></span>
+<h2 id="1-查找国内的开源镜像提供的源地址"><a href="#1-查找国内的开源镜像提供的源地址" class="headerlink" title="1. 查找国内的开源镜像提供的源地址"></a>1. 查找国内的开源镜像提供的源地址</h2><blockquote>
+<p>Ubuntu的源的list文件位于 <code>/etc/apt/sources.list</code></p>
+</blockquote>
+<ul>
+<li>高校镜像源（国内其他大学也有提供，可自行查找）<br><a href="http://link.zhihu.com/?target=https%3A//mirrors.tuna.tsinghua.edu.cn/help/ubuntu/" title="清华大学开源镜像站">清华大学开源镜像站 </a><br><a href="http://link.zhihu.com/?target=https%3A//mirrors.ustc.edu.cn/repogen/" title="中科大开源镜像站">中科大开源镜像站</a></li>
+</ul>
+<ul>
+<li>企业镜像源（其他企业的请自行查找）<br><a href="http://link.zhihu.com/?target=http%3A//mirrors.aliyun.com/help/ubuntu" title="阿里云开源镜像站">阿里云开源镜像站 </a><br><a href="http://link.zhihu.com/?target=http%3A//mirrors.163.com/.help/ubuntu.html" title="网易开源镜像站">网易开源镜像站</a></li>
+</ul>
+<p><strong>这里以清华源为例</strong></p>
+<p>先去查一下清华源的帮助文档，戳 <a href="http://link.zhihu.com/?target=https%3A//mirrors.tuna.tsinghua.edu.cn/help/ubuntu/" title="清华大学开源镜像站">清华大学开源镜像站 </a>，选择相匹配的Ubuntu的版本，会得到软件源镜像的地址。</p>
+<p>接下来直接替换一下系统的source.list文件<del>~</del></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 备份一下</span></span><br><span class="line">sudo <span class="built_in">cp</span> /etc/apt/sources.list /etc/apt/sources.list.bak</span><br><span class="line"><span class="comment"># 修改</span></span><br><span class="line">sudo vi /etc/apt/sources.list</span><br></pre></td></tr></table></figure>
+<p>将文档里面所有的内容删除，然后替换为清华镜像提供的软件源镜像的地址。<br>例如我用的 16.04 版， 替换为：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted universe multiverse</span></span><br></pre></td></tr></table></figure>
+<p>然后再update一下，你会发现速度还是有明显的提升的。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt update</span><br></pre></td></tr></table></figure>
+<h2 id="2-使用apt安装软件"><a href="#2-使用apt安装软件" class="headerlink" title="2. 使用apt安装软件"></a>2. 使用apt安装软件</h2><p>这个就不多说了，比较简单，譬如安装tree</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt install tree -y</span><br></pre></td></tr></table></figure>
+<p>这里的 -y 参数是为了在安装的时候默认选择yes</p>
+<h2 id="3-deb包安装-amp-卸载（需要先下载好）"><a href="#3-deb包安装-amp-卸载（需要先下载好）" class="headerlink" title="3. deb包安装&amp;卸载（需要先下载好）"></a>3. deb包安装&amp;卸载（需要先下载好）</h2><ul>
+<li>安装命令<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo dpkg -i xxx.deb</span><br></pre></td></tr></table></figure></li>
+<li>安装依赖（如果提示需要的话）<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get install -f</span><br></pre></td></tr></table></figure></li>
+<li>自动清除残留配置文件<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get autoclean</span><br><span class="line">sudo apt-get autoremove</span><br></pre></td></tr></table></figure></li>
+<li>完全卸载<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get remove --purge name</span><br></pre></td></tr></table></figure>
+一般来说，这样的卸载会比较干净地卸载掉软件。有些没有办法自动删除的文件，可以手动去删除掉</li>
+</ul>
+<h2 id="4-另一种deb包安装方式"><a href="#4-另一种deb包安装方式" class="headerlink" title="4. 另一种deb包安装方式"></a>4. 另一种deb包安装方式</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># cd到安装包目录</span></span><br><span class="line">sudo apt install ./xxxx.deb</span><br></pre></td></tr></table></figure>
+<h2 id="5-安装filename-tar-gz软件"><a href="#5-安装filename-tar-gz软件" class="headerlink" title="5. 安装filename.tar.gz软件"></a>5. 安装filename.tar.gz软件</h2><ul>
+<li>解压</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tar -xzvf file.tar.gz</span><br></pre></td></tr></table></figure>
+<ul>
+<li>然后在解压目录或者bin文件夹中执行setup.sh文件。。。这个一般不定，安装前最好查一下官网说明</li>
+</ul>
+<h2 id="6-源码安装"><a href="#6-源码安装" class="headerlink" title="6. 源码安装"></a>6. 源码安装</h2><p>有些软件没有被收录进软件镜像源，或者说开发者需要去使用他们最新的版本，这时候就要自己去他们的官网或者是代码托管平台下载最新的Linux源码，自己来build。</p>
+<p>这种方式安装需<strong>要解决很多的依赖</strong>。。。。安装前，多问问度娘，Google</p>
+<p>此处还是以tree为例：</p>
+<ul>
+<li>先去 <a href="http://link.zhihu.com/?target=ftp%3A//mama.indstate.edu/linux/tree/" title="Tree FTP">Tree FTP</a> 下载最新的源码包</li>
+<li>解压</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tar zxf tree-1.7.0.tgz</span><br><span class="line"><span class="built_in">cd</span>  tree-1.7.0/</span><br><span class="line">make and install</span><br><span class="line">sudo make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
+<p><strong>如果没有配置g++环境，先用apt安装build-essential</strong></p>
+<ul>
+<li>OK, 大功告成<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nutao@master:~/Public/tree-1.7.0$ tree</span><br><span class="line">.</span><br><span class="line">├── CHANGES</span><br><span class="line">├── color.c</span><br><span class="line">├── color.o</span><br><span class="line">├── doc</span><br><span class="line">│   ├── tree.1</span><br><span class="line">│   ├── tree.1.fr</span><br><span class="line">│   └── xml.dtd</span><br><span class="line">├── hash.c</span><br><span class="line">├── hash.o</span><br><span class="line">├── html.c</span><br><span class="line">├── html.o</span><br><span class="line">├── INSTALL</span><br><span class="line">├── json.c</span><br><span class="line">├── json.o</span><br><span class="line">├── LICENSE</span><br><span class="line">├── Makefile</span><br><span class="line">├── README</span><br><span class="line">├── strverscmp.c</span><br><span class="line">├── TODO</span><br><span class="line">├── tree</span><br><span class="line">├── tree.c</span><br><span class="line">├── tree.h</span><br><span class="line">├── tree.o</span><br><span class="line">├── unix.c</span><br><span class="line">├── unix.o</span><br><span class="line">├── xml.c</span><br><span class="line">└── xml.o</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="常用压缩文件的解压命令"><a href="#常用压缩文件的解压命令" class="headerlink" title="常用压缩文件的解压命令"></a>常用压缩文件的解压命令</h2><p>1、<em>.tar 用 tar –xvf 解压<br>2、</em>.gz 用 gzip -d或者gunzip 解压<br>3、.tar.gz和.tgz 用 tar –xzf 解压<br>4、<em>.bz2 用 bzip2 -d或者用bunzip2 解压<br>5、</em>.tar.bz2用tar –xjf 解压<br>6、<em>.Z 用 uncompress 解压<br>7、</em>.tar.Z 用tar –xZf 解压<br>8、<em>.rar 用 unrar e解压<br>9、</em>.zip 用 unzip 解压</p>
+]]></content>
+      <categories>
+        <category>Ubuntu</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Ubuntu16.04 Grub Rescue</title>
     <url>/2017/07/13/Ubuntu16-04-Grub-Rescue/</url>
     <content><![CDATA[<p>如果某一天, 你不小心扩展了一下你的 / 目录, 又忘记了更新 grub 引导. 不好意思, 你有麻烦了</p>
@@ -978,8 +1042,11 @@
   <entry>
     <title>Windows subsystem for Linux2 (WSL2) 入坑指南</title>
     <url>/2023/06/05/Windows-subsystem-for-Linux2-WSL2-%E5%85%A5%E5%9D%91%E6%8C%87%E5%8D%97/</url>
-    <content><![CDATA[<p>WSL 2 是适用于 Linux 的 Windows 子系统体系结构的一个新版本，它支持适用于 Linux 的 Windows 子系统在 Windows 上运行 ELF64 Linux 二进制文件。相比于WSL1，WSL2 使用的是全新的体系结构，能够通过子系统方式运行<strong>真正的 Linux内核</strong>。</p>
+    <content><![CDATA[<p><img src="/2023/06/05/Windows-subsystem-for-Linux2-WSL2-%E5%85%A5%E5%9D%91%E6%8C%87%E5%8D%97/WSL2.png" alt="WSL2"></p>
+<p>WSL 2 是适用于 Linux 的 Windows 子系统体系结构的一个新版本，它支持适用于 Linux 的 Windows 子系统在 Windows 上运行 ELF64 Linux 二进制文件。相比于WSL1，WSL2 使用的是全新的体系结构，能够通过子系统方式运行<strong>真正的 Linux内核</strong>。</p>
 <!-- more  -->
+
+
 
 <h2 id="一、WSL1-与-WSL2-对比"><a href="#一、WSL1-与-WSL2-对比" class="headerlink" title="一、WSL1 与 WSL2 对比"></a>一、WSL1 与 WSL2 对比</h2><p>WSL2在<strong>托管 VM</strong> 内使用实际的 Linux 内核，在牺牲部分跨OS文件系统性能（子系统和windows之间进行文件写入、复制或修改）的情况下，支持完整的系统调用兼容性以及跨 Linux 和 Windows 操作系统的性能。以下为两个版本的WSL功能对比：</p>
 <table>
@@ -1041,7 +1108,16 @@
 </blockquote>
 <p>安装前，需要检查windows版本。。。按windows建，输入 <code>winver</code> ..</p>
 <p><img src="/2023/06/05/Windows-subsystem-for-Linux2-WSL2-%E5%85%A5%E5%9D%91%E6%8C%87%E5%8D%97/winver.png" alt="image-20230606173940852"></p>
-<h2 id="三、安装WSL2及Linux"><a href="#三、安装WSL2及Linux" class="headerlink" title="三、安装WSL2及Linux"></a>三、安装WSL2及Linux</h2><p>使用<strong>管理员模式</strong>打开Powershell或者CMD，</p>
+<h2 id="三、安装WSL2及Linux"><a href="#三、安装WSL2及Linux" class="headerlink" title="三、安装WSL2及Linux"></a>三、安装WSL2及Linux</h2><blockquote>
+<p>建议先手动下载WSL Kernel Update包，手动安装后，再执行下述操作</p>
+<p>下载地址：<a href="https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi">https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi</a></p>
+</blockquote>
+<p>使用<strong>管理员模式</strong>打开Powershell或者CMD，</p>
+<ul>
+<li>设置WSL版本为2</li>
+</ul>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">--set-default-version</span> <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>查看wsl发行版</li>
 </ul>
@@ -1060,7 +1136,13 @@
 
 
 
-<h2 id="四、使用WSL2的一些骚操作"><a href="#四、使用WSL2的一些骚操作" class="headerlink" title="四、使用WSL2的一些骚操作"></a>四、使用WSL2的一些骚操作</h2><h3 id="1、使用GPU跑ML任务"><a href="#1、使用GPU跑ML任务" class="headerlink" title="1、使用GPU跑ML任务"></a>1、使用GPU跑ML任务</h3><h3 id="2、使用VSCode实现Win开发，WSL部署"><a href="#2、使用VSCode实现Win开发，WSL部署" class="headerlink" title="2、使用VSCode实现Win开发，WSL部署"></a>2、使用VSCode实现Win开发，WSL部署</h3><h3 id="3、开启WSL子系统图形界面"><a href="#3、开启WSL子系统图形界面" class="headerlink" title="3、开启WSL子系统图形界面"></a>3、开启WSL子系统图形界面</h3><h3 id="4、在windows上安装并使用真正意义上的Docker"><a href="#4、在windows上安装并使用真正意义上的Docker" class="headerlink" title="4、在windows上安装并使用真正意义上的Docker"></a>4、在windows上安装并使用真正意义上的Docker</h3>]]></content>
+<h2 id="四、（TODO）使用WSL2的一些骚操作"><a href="#四、（TODO）使用WSL2的一些骚操作" class="headerlink" title="四、（TODO）使用WSL2的一些骚操作"></a>四、（TODO）使用WSL2的一些骚操作</h2><ol>
+<li>使用VSCode实现WSL环境的开发与部署。</li>
+<li>开启WSL子系统图形界面，IDE跑起来。</li>
+<li>在windows11上使用Docker，打通Windows与WSL的开发部署流程。</li>
+<li>在WSL中使用主机的GPU跑机器学习任务。</li>
+</ol>
+]]></content>
       <categories>
         <category>Ubuntu</category>
       </categories>
@@ -1248,70 +1330,6 @@
       </categories>
       <tags>
         <tag>git</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Ubuntu 换源，安装&amp;卸载软件</title>
-    <url>/2017/07/17/Ubuntu-%E6%8D%A2%E6%BA%90%EF%BC%8C%E5%AE%89%E8%A3%85-%E5%8D%B8%E8%BD%BD%E8%BD%AF%E4%BB%B6/</url>
-    <content><![CDATA[<p>国内的筒子们，经常发现在update的时候各种卡。。。有时候心情好，等等也就罢了。万一某一天急着安装软件，那种状态下，真的是多等一秒感觉都是心烦气躁的。所以，本文就来跟大家聊聊在Ubuntu 中换源，安装&amp;卸载软件的那些事，欢迎各位一起交流。。。<br><img src="/images/ubuntu16.04.png" alt="Ubuntu16.04"></p>
-<span id="more"></span>
-<h2 id="1-查找国内的开源镜像提供的源地址"><a href="#1-查找国内的开源镜像提供的源地址" class="headerlink" title="1. 查找国内的开源镜像提供的源地址"></a>1. 查找国内的开源镜像提供的源地址</h2><blockquote>
-<p>Ubuntu的源的list文件位于 <code>/etc/apt/sources.list</code></p>
-</blockquote>
-<ul>
-<li>高校镜像源（国内其他大学也有提供，可自行查找）<br><a href="http://link.zhihu.com/?target=https%3A//mirrors.tuna.tsinghua.edu.cn/help/ubuntu/" title="清华大学开源镜像站">清华大学开源镜像站 </a><br><a href="http://link.zhihu.com/?target=https%3A//mirrors.ustc.edu.cn/repogen/" title="中科大开源镜像站">中科大开源镜像站</a></li>
-</ul>
-<ul>
-<li>企业镜像源（其他企业的请自行查找）<br><a href="http://link.zhihu.com/?target=http%3A//mirrors.aliyun.com/help/ubuntu" title="阿里云开源镜像站">阿里云开源镜像站 </a><br><a href="http://link.zhihu.com/?target=http%3A//mirrors.163.com/.help/ubuntu.html" title="网易开源镜像站">网易开源镜像站</a></li>
-</ul>
-<p><strong>这里以清华源为例</strong></p>
-<p>先去查一下清华源的帮助文档，戳 <a href="http://link.zhihu.com/?target=https%3A//mirrors.tuna.tsinghua.edu.cn/help/ubuntu/" title="清华大学开源镜像站">清华大学开源镜像站 </a>，选择相匹配的Ubuntu的版本，会得到软件源镜像的地址。</p>
-<p>接下来直接替换一下系统的source.list文件<del>~</del></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 备份一下</span></span><br><span class="line">sudo <span class="built_in">cp</span> /etc/apt/sources.list /etc/apt/sources.list.bak</span><br><span class="line"><span class="comment"># 修改</span></span><br><span class="line">sudo vi /etc/apt/sources.list</span><br></pre></td></tr></table></figure>
-<p>将文档里面所有的内容删除，然后替换为清华镜像提供的软件源镜像的地址。<br>例如我用的 16.04 版， 替换为：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted universe multiverse</span></span><br></pre></td></tr></table></figure>
-<p>然后再update一下，你会发现速度还是有明显的提升的。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt update</span><br></pre></td></tr></table></figure>
-<h2 id="2-使用apt安装软件"><a href="#2-使用apt安装软件" class="headerlink" title="2. 使用apt安装软件"></a>2. 使用apt安装软件</h2><p>这个就不多说了，比较简单，譬如安装tree</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt install tree -y</span><br></pre></td></tr></table></figure>
-<p>这里的 -y 参数是为了在安装的时候默认选择yes</p>
-<h2 id="3-deb包安装-amp-卸载（需要先下载好）"><a href="#3-deb包安装-amp-卸载（需要先下载好）" class="headerlink" title="3. deb包安装&amp;卸载（需要先下载好）"></a>3. deb包安装&amp;卸载（需要先下载好）</h2><ul>
-<li>安装命令<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo dpkg -i xxx.deb</span><br></pre></td></tr></table></figure></li>
-<li>安装依赖（如果提示需要的话）<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get install -f</span><br></pre></td></tr></table></figure></li>
-<li>自动清除残留配置文件<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get autoclean</span><br><span class="line">sudo apt-get autoremove</span><br></pre></td></tr></table></figure></li>
-<li>完全卸载<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get remove --purge name</span><br></pre></td></tr></table></figure>
-一般来说，这样的卸载会比较干净地卸载掉软件。有些没有办法自动删除的文件，可以手动去删除掉</li>
-</ul>
-<h2 id="4-另一种deb包安装方式"><a href="#4-另一种deb包安装方式" class="headerlink" title="4. 另一种deb包安装方式"></a>4. 另一种deb包安装方式</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># cd到安装包目录</span></span><br><span class="line">sudo apt install ./xxxx.deb</span><br></pre></td></tr></table></figure>
-<h2 id="5-安装filename-tar-gz软件"><a href="#5-安装filename-tar-gz软件" class="headerlink" title="5. 安装filename.tar.gz软件"></a>5. 安装filename.tar.gz软件</h2><ul>
-<li>解压</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tar -xzvf file.tar.gz</span><br></pre></td></tr></table></figure>
-<ul>
-<li>然后在解压目录或者bin文件夹中执行setup.sh文件。。。这个一般不定，安装前最好查一下官网说明</li>
-</ul>
-<h2 id="6-源码安装"><a href="#6-源码安装" class="headerlink" title="6. 源码安装"></a>6. 源码安装</h2><p>有些软件没有被收录进软件镜像源，或者说开发者需要去使用他们最新的版本，这时候就要自己去他们的官网或者是代码托管平台下载最新的Linux源码，自己来build。</p>
-<p>这种方式安装需<strong>要解决很多的依赖</strong>。。。。安装前，多问问度娘，Google</p>
-<p>此处还是以tree为例：</p>
-<ul>
-<li>先去 <a href="http://link.zhihu.com/?target=ftp%3A//mama.indstate.edu/linux/tree/" title="Tree FTP">Tree FTP</a> 下载最新的源码包</li>
-<li>解压</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tar zxf tree-1.7.0.tgz</span><br><span class="line"><span class="built_in">cd</span>  tree-1.7.0/</span><br><span class="line">make and install</span><br><span class="line">sudo make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
-<p><strong>如果没有配置g++环境，先用apt安装build-essential</strong></p>
-<ul>
-<li>OK, 大功告成<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nutao@master:~/Public/tree-1.7.0$ tree</span><br><span class="line">.</span><br><span class="line">├── CHANGES</span><br><span class="line">├── color.c</span><br><span class="line">├── color.o</span><br><span class="line">├── doc</span><br><span class="line">│   ├── tree.1</span><br><span class="line">│   ├── tree.1.fr</span><br><span class="line">│   └── xml.dtd</span><br><span class="line">├── hash.c</span><br><span class="line">├── hash.o</span><br><span class="line">├── html.c</span><br><span class="line">├── html.o</span><br><span class="line">├── INSTALL</span><br><span class="line">├── json.c</span><br><span class="line">├── json.o</span><br><span class="line">├── LICENSE</span><br><span class="line">├── Makefile</span><br><span class="line">├── README</span><br><span class="line">├── strverscmp.c</span><br><span class="line">├── TODO</span><br><span class="line">├── tree</span><br><span class="line">├── tree.c</span><br><span class="line">├── tree.h</span><br><span class="line">├── tree.o</span><br><span class="line">├── unix.c</span><br><span class="line">├── unix.o</span><br><span class="line">├── xml.c</span><br><span class="line">└── xml.o</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h2 id="常用压缩文件的解压命令"><a href="#常用压缩文件的解压命令" class="headerlink" title="常用压缩文件的解压命令"></a>常用压缩文件的解压命令</h2><p>1、<em>.tar 用 tar –xvf 解压<br>2、</em>.gz 用 gzip -d或者gunzip 解压<br>3、.tar.gz和.tgz 用 tar –xzf 解压<br>4、<em>.bz2 用 bzip2 -d或者用bunzip2 解压<br>5、</em>.tar.bz2用tar –xjf 解压<br>6、<em>.Z 用 uncompress 解压<br>7、</em>.tar.Z 用tar –xZf 解压<br>8、<em>.rar 用 unrar e解压<br>9、</em>.zip 用 unzip 解压</p>
-]]></content>
-      <categories>
-        <category>Ubuntu</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>Ubuntu</tag>
       </tags>
   </entry>
   <entry>

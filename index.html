@@ -238,8 +238,11 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>WSL 2 是适用于 Linux 的 Windows 子系统体系结构的一个新版本，它支持适用于 Linux 的 Windows 子系统在 Windows 上运行 ELF64 Linux 二进制文件。相比于WSL1，WSL2 使用的是全新的体系结构，能够通过子系统方式运行<strong>真正的 Linux内核</strong>。</p>
+          <p><img src="/2023/06/05/Windows-subsystem-for-Linux2-WSL2-%E5%85%A5%E5%9D%91%E6%8C%87%E5%8D%97/WSL2.png" alt="WSL2"></p>
+<p>WSL 2 是适用于 Linux 的 Windows 子系统体系结构的一个新版本，它支持适用于 Linux 的 Windows 子系统在 Windows 上运行 ELF64 Linux 二进制文件。相比于WSL1，WSL2 使用的是全新的体系结构，能够通过子系统方式运行<strong>真正的 Linux内核</strong>。</p>
 <!-- more  -->
+
+
 
 <h2 id="一、WSL1-与-WSL2-对比"><a href="#一、WSL1-与-WSL2-对比" class="headerlink" title="一、WSL1 与 WSL2 对比"></a>一、WSL1 与 WSL2 对比</h2><p>WSL2在<strong>托管 VM</strong> 内使用实际的 Linux 内核，在牺牲部分跨OS文件系统性能（子系统和windows之间进行文件写入、复制或修改）的情况下，支持完整的系统调用兼容性以及跨 Linux 和 Windows 操作系统的性能。以下为两个版本的WSL功能对比：</p>
 <table>
@@ -301,7 +304,16 @@
 </blockquote>
 <p>安装前，需要检查windows版本。。。按windows建，输入 <code>winver</code> ..</p>
 <p><img src="/2023/06/05/Windows-subsystem-for-Linux2-WSL2-%E5%85%A5%E5%9D%91%E6%8C%87%E5%8D%97/winver.png" alt="image-20230606173940852"></p>
-<h2 id="三、安装WSL2及Linux"><a href="#三、安装WSL2及Linux" class="headerlink" title="三、安装WSL2及Linux"></a>三、安装WSL2及Linux</h2><p>使用<strong>管理员模式</strong>打开Powershell或者CMD，</p>
+<h2 id="三、安装WSL2及Linux"><a href="#三、安装WSL2及Linux" class="headerlink" title="三、安装WSL2及Linux"></a>三、安装WSL2及Linux</h2><blockquote>
+<p>建议先手动下载WSL Kernel Update包，手动安装后，再执行下述操作</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi">https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi</a></p>
+</blockquote>
+<p>使用<strong>管理员模式</strong>打开Powershell或者CMD，</p>
+<ul>
+<li>设置WSL版本为2</li>
+</ul>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wsl <span class="literal">--set-default-version</span> <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>查看wsl发行版</li>
 </ul>
@@ -320,7 +332,13 @@
 
 
 
-<h2 id="四、使用WSL2的一些骚操作"><a href="#四、使用WSL2的一些骚操作" class="headerlink" title="四、使用WSL2的一些骚操作"></a>四、使用WSL2的一些骚操作</h2><h3 id="1、使用GPU跑ML任务"><a href="#1、使用GPU跑ML任务" class="headerlink" title="1、使用GPU跑ML任务"></a>1、使用GPU跑ML任务</h3><h3 id="2、使用VSCode实现Win开发，WSL部署"><a href="#2、使用VSCode实现Win开发，WSL部署" class="headerlink" title="2、使用VSCode实现Win开发，WSL部署"></a>2、使用VSCode实现Win开发，WSL部署</h3><h3 id="3、开启WSL子系统图形界面"><a href="#3、开启WSL子系统图形界面" class="headerlink" title="3、开启WSL子系统图形界面"></a>3、开启WSL子系统图形界面</h3><h3 id="4、在windows上安装并使用真正意义上的Docker"><a href="#4、在windows上安装并使用真正意义上的Docker" class="headerlink" title="4、在windows上安装并使用真正意义上的Docker"></a>4、在windows上安装并使用真正意义上的Docker</h3>
+<h2 id="四、（TODO）使用WSL2的一些骚操作"><a href="#四、（TODO）使用WSL2的一些骚操作" class="headerlink" title="四、（TODO）使用WSL2的一些骚操作"></a>四、（TODO）使用WSL2的一些骚操作</h2><ol>
+<li>使用VSCode实现WSL环境的开发与部署。</li>
+<li>开启WSL子系统图形界面，IDE跑起来。</li>
+<li>在windows11上使用Docker，打通Windows与WSL的开发部署流程。</li>
+<li>在WSL中使用主机的GPU跑机器学习任务。</li>
+</ol>
+
       
     </div>
 
