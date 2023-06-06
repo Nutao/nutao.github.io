@@ -7,12 +7,15 @@ tags:
 categories:
     - Ubuntu
 comments: false
-
 ---
 
-WSL 2 是适用于 Linux 的 Windows 子系统体系结构的一个新版本，它支持适用于 Linux 的 Windows 子系统在 Windows 上运行 ELF64 Linux 二进制文件。相比于WSL1，WSL2 使用的是全新的体系结构，能够通过子系统方式运行**真正的 Linux内核**。
+![WSL2](./Windows-subsystem-for-Linux2-WSL2-入坑指南/WSL2.png)
 
+WSL 2 是适用于 Linux 的 Windows 子系统体系结构的一个新版本，它支持适用于 Linux 的 Windows 子系统在 Windows 上运行 ELF64 Linux 二进制文件。相比于WSL1，WSL2 使用的是全新的体系结构，能够通过子系统方式运行**真正的 Linux内核**。
 <!-- more  -->
+<!-- more  -->
+
+
 
 ## 一、WSL1 与 WSL2 对比
 
@@ -47,7 +50,17 @@ WSL2在**托管 VM** 内使用实际的 Linux 内核，在牺牲部分跨OS文�
 
 ## 三、安装WSL2及Linux
 
+> 建议先手动下载WSL Kernel Update包，手动安装后，再执行下述操作
+>
+> 下载地址：https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi
+
 使用**管理员模式**打开Powershell或者CMD，
+
+- 设置WSL版本为2
+
+```powershell
+wsl --set-default-version 2
+```
 
 - 查看wsl发行版
 
@@ -90,12 +103,9 @@ wsl --list -v
 
 
 
-## 四、使用WSL2的一些骚操作
+## 四、（TODO）使用WSL2的一些骚操作
 
-### 1、使用GPU跑ML任务
-
-### 2、使用VSCode实现Win开发，WSL部署
-
-### 3、开启WSL子系统图形界面
-
-### 4、在windows上安装并使用真正意义上的Docker
+1. 使用VSCode实现WSL环境的开发与部署。
+2. 开启WSL子系统图形界面，IDE跑起来。
+3. 在windows11上使用Docker，打通Windows与WSL的开发部署流程。
+4. 在WSL中使用主机的GPU跑机器学习任务。
