@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"nutao.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一些docker快速启动服务的笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker-db简单配置">
+<meta property="og:url" content="https://nutao.github.io/2021/09/07/docker-db%E7%AE%80%E5%8D%95%E9%85%8D%E7%BD%AE/index.html">
+<meta property="og:site_name" content="Nutao">
+<meta property="og:description" content="一些docker快速启动服务的笔记">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-09-07T07:56:21.000Z">
+<meta property="article:modified_time" content="2021-09-07T07:56:21.000Z">
+<meta property="article:author" content="Nutao">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Docker">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://nutao.github.io/2021/09/07/docker-db%E7%AE%80%E5%8D%95%E9%85%8D%E7%BD%AE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>docker-db简单配置 | Nutao</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Nutao</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://nutao.github.io/2021/09/07/docker-db%E7%AE%80%E5%8D%95%E9%85%8D%E7%BD%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Nutao">
+      <meta itemprop="description" content="No Pains, No Gains!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Nutao">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          docker-db简单配置
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-09-07 15:56:21" itemprop="dateCreated datePublished" datetime="2021-09-07T15:56:21+08:00">2021-09-07</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Docker/" itemprop="url" rel="index"><span itemprop="name">Docker</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>一些docker快速启动服务的笔记</p>
+<span id="more"></span>
+
+<h3 id="1-MongoDB-本地服务"><a href="#1-MongoDB-本地服务" class="headerlink" title="1. MongoDB 本地服务"></a>1. MongoDB 本地服务</h3><h4 id="1-1-创建MongoDB容器实例"><a href="#1-1-创建MongoDB容器实例" class="headerlink" title="1.1 创建MongoDB容器实例"></a>1.1 创建MongoDB容器实例</h4><p>GUI 工具：<strong>robo 3t</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建卷</span></span><br><span class="line">docker volume create mongo</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">启动mongo容器实例</span></span><br><span class="line">docker run -p 27017:27017  --restart=always  --mount source=mongo,destination=/var/lib/mongodb --name mongo -d mongo --auth</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">登录container</span></span><br><span class="line">docker exec -it mongo mongo admin</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>添加admin作为<strong>用户管理用户</strong></li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建用户</span></span><br><span class="line">db.createUser(&#123; user:&#x27;admin&#x27;,pwd:&#x27;123456&#x27;,roles:[&#123; role:&#x27;userAdminAnyDatabase&#x27;, db: &#x27;admin&#x27;&#125;]&#125;);</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">登录用户</span></span><br><span class="line">db.auth(&#x27;admin&#x27;,&#x27;123456&#x27;)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>创建用户和自测用的collection</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">db.createUser(&#123; user:&#x27;nutao&#x27;,pwd:&#x27;123456&#x27;,roles:[ &#123; role:&#x27;dbOwner&#x27;, db: &#x27;nutao&#x27;&#125;]&#125;);</span><br><span class="line">db.auth(&#x27;nutao&#x27;,&#x27;123456&#x27;)</span><br><span class="line">use nutao</span><br><span class="line">db.nutao.insert(&#123;&quot;test&quot;: &quot;test&quot;&#125;)</span><br><span class="line"></span><br><span class="line">db.createUser(&#123; user:&#x27;nutao2&#x27;,pwd:&#x27;123456&#x27;,roles:[&#123; role:&#x27;readWriteAnyDatabase&#x27;, db: &#x27;admin&#x27;&#125;,&#123; role:&#x27;dbAdmin&#x27;, db: &#x27;nutao&#x27;&#125;]&#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-2-MongoDB内置用户角色"><a href="#1-2-MongoDB内置用户角色" class="headerlink" title="1.2 MongoDB内置用户角色"></a>1.2 MongoDB内置用户角色</h4><ul>
+<li>数据库用户角色：read、readWrite;</li>
+<li>数据库管理角色：dbAdmin、dbOwner、userAdmin；</li>
+<li>集群管理角色：clusterAdmin、clusterManager、clusterMonitor、hostManager；</li>
+<li>备份恢复角色：backup、restore；</li>
+<li>所有数据库角色：readAnyDatabase、readWriteAnyDatabase、userAdminAnyDatabase、dbAdminAnyDatabase</li>
+<li>超级用户角色：root  </li>
+<li>// 这里还有几个角色间接或直接提供了系统超级用户的访问（dbOwner 、userAdmin、userAdminAnyDatabase）</li>
+<li>内部角色：__system </li>
+</ul>
+<p>具体角色的功能： </p>
+<ul>
+<li>Read：允许用户读取指定数据库</li>
+<li>readWrite：允许用户读写指定数据库</li>
+<li>dbAdmin：允许用户在指定数据库中执行管理函数，如索引创建、删除，查看统计或访问system.profile</li>
+<li>userAdmin：允许用户向system.users集合写入，可以找指定数据库里创建、删除和管理用户</li>
+<li>clusterAdmin：只在admin数据库中可用，赋予用户所有分片和复制集相关函数的管理权限。</li>
+<li>readAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的读权限</li>
+<li>readWriteAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的读写权限</li>
+<li>userAdminAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的userAdmin权限</li>
+<li>dbAdminAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的dbAdmin权限。</li>
+<li>root：只在admin数据库中可用。超级账号，超级权限</li>
+</ul>
+<h3 id="2-Redis本地服务"><a href="#2-Redis本地服务" class="headerlink" title="2. Redis本地服务"></a>2. Redis本地服务</h3><h4 id="2-1-创建容器实例"><a href="#2-1-创建容器实例" class="headerlink" title="2.1 创建容器实例"></a>2.1 创建容器实例</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -itd --name redis -p 6379:6379 -m 500m redis:latest --requirepass &quot;123456&quot; --tcp-keepalive 50</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>参数意思：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">-d          后台运行容器，并返回容器ID</span><br><span class="line">-i          以交互模式运行容器，通常与 -t 同时使用</span><br><span class="line">-t          为容器重新分配一个伪输入终端，通常与 -i 同时使用</span><br><span class="line">--name      指定容器名称为myredis</span><br><span class="line">-p          指定容器端口</span><br><span class="line">-m          指定容器内存使用限制</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>连接服务</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it redis redis-cli</span><br><span class="line">127.0.0.1:6379&gt; AUTH 123456</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-Mysql、mariadb本地服务"><a href="#3-Mysql、mariadb本地服务" class="headerlink" title="3. Mysql、mariadb本地服务"></a>3. Mysql、mariadb本地服务</h3><h4 id="3-1-创建容器实例"><a href="#3-1-创建容器实例" class="headerlink" title="3.1 创建容器实例"></a>3.1 创建容器实例</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建卷</span></span><br><span class="line">docker volume create mariadb</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">启动服务</span></span><br><span class="line">docker run -p 3306:3306  --restart=always  --mount source=mariadb,destination=/var/lib/mysql  --name mariadb -e MYSQL_ROOT_PASSWORD=123456 -d mariadb:latest</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">导出</span></span><br><span class="line">mysqldump -uroot -pDo1cloudUserCenter123456 -h 10.22.0.49 -P 3306 usercenter_resource &gt; usercenter_resource.sql</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">导入</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-swagger"><a href="#4-swagger" class="headerlink" title="4. swagger"></a>4. swagger</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -p 20000:8080 -v /root/devops/docker-volume/swagger/swagger.json:/app/swagger.json --name swagger swagger:latest</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="5-rabbitMq"><a href="#5-rabbitMq" class="headerlink" title="5 rabbitMq"></a>5 rabbitMq</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --hostname my-rabbit --name rabbitmq -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin -p 15672:15672 -p 5672:5672 -p 25672:25672 -p 61613:61613 -p 1883:1883 rabbitmq:management</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>15672：控制台端口号</li>
+<li>5672：应用访问端口号</li>
+</ol>
+<h3 id="6-postgresql"><a href="#6-postgresql" class="headerlink" title="6. postgresql"></a>6. postgresql</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建卷</span></span><br><span class="line">docker volume create pgsql </span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建容器</span></span><br><span class="line">docker run --name postgres -e POSTGRES_PASSWORD=123456 -p 5432:5432  --restart=always  --mount <span class="built_in">source</span>=pgsql,destination=/var/lib/postgresql  -d postgres:latest</span><br><span class="line"></span><br><span class="line"><span class="comment"># 账号 postgres 123456</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>常用命令</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">除了前面已经用到的\password命令（设置密码）和\q命令（退出）以外，控制台还提供一系列其他命令。</span><br><span class="line">\h：查看SQL命令的解释，比如\h select。</span><br><span class="line">\?：查看psql命令列表。</span><br><span class="line">\l：列出所有数据库。</span><br><span class="line">\c [database_name]：连接其他数据库。</span><br><span class="line">\d：列出当前数据库的所有表格。</span><br><span class="line">\d [table_name]：列出某一张表格的结构。</span><br><span class="line">\du：列出所有用户。</span><br><span class="line">\e：打开文本编辑器。</span><br><span class="line">\conninfo：列出当前数据库和连接的信息。</span><br><span class="line">\x: 转换为列模式</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查询表结构</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">	a.attnum  <span class="keyword">AS</span> &quot;id&quot;,</span><br><span class="line">	c.relname <span class="keyword">AS</span> &quot;表名&quot;,</span><br><span class="line">	<span class="built_in">CAST</span>(obj_description(relfilenode, <span class="string">&#x27;pg_class&#x27;</span>) <span class="keyword">as</span> <span class="type">VARCHAR</span> ) <span class="keyword">as</span> &quot;table desc&quot;,</span><br><span class="line">	a.attname <span class="keyword">as</span> &quot;column name&quot;,</span><br><span class="line">	concat_ws(<span class="string">&#x27;&#x27;</span>, t.typname, <span class="built_in">SUBSTRING</span>(format_type(a.atttypid, a.atttypmod) <span class="keyword">FROM</span> <span class="string">&#x27;\(.*\)&#x27;</span>)) <span class="keyword">as</span> &quot;column type&quot;,</span><br><span class="line">	d.description <span class="keyword">as</span> &quot;COLUMN comment&quot;</span><br><span class="line"><span class="keyword">FROM</span> </span><br><span class="line">	pg_class <span class="keyword">as</span> c, pg_attribute <span class="keyword">as</span> a, pg_type <span class="keyword">as</span> t, pg_description <span class="keyword">as</span> d</span><br><span class="line"><span class="keyword">WHERE</span> c.relname <span class="operator">=</span> <span class="string">&#x27;mfa_consul_order&#x27;</span></span><br><span class="line">	<span class="keyword">AND</span> a.attnum <span class="operator">&gt;</span> <span class="number">0</span></span><br><span class="line">	<span class="keyword">AND</span> a.attrelid <span class="operator">=</span> c.oid</span><br><span class="line">	<span class="keyword">AND</span> a.atttypid <span class="operator">=</span> t.oid</span><br><span class="line">	<span class="keyword">AND</span> d.objoid <span class="operator">=</span> a.attrelid</span><br><span class="line">	<span class="keyword">AND</span> d.objsubid <span class="operator">=</span> a.attnum</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> c.relname <span class="keyword">DESC</span>, a.attnum <span class="keyword">ASC</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查询db占用空间</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> pg_database.datname, pg_size_pretty (pg_database_size(pg_database.datname)) <span class="keyword">AS</span> size <span class="keyword">from</span> pg_database; </span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="7-Consul"><a href="#7-Consul" class="headerlink" title="7.  Consul"></a>7.  Consul</h3><ul>
+<li><p>创建单机consul</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --name=consul-node1 -p 8500:8500 -e CONSUL_BIND_INTERFACE=eth0 consul:1.10</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建集群</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看第一个节点的IP</span></span><br><span class="line">docker inspect -f=&#x27;&#123;&#123;.NetworkSettings.IPAddress&#125;&#125;&#x27; consul-node1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建并启动第二个节点，172.17.0.3是第一个节点的IP</span></span><br><span class="line">docker run -d --name=consul-node2 -p 8501:8500 -e CONSUL_BIND_INTERFACE=eth0 consul:1.10 agent -dev -join=172.17.0.3</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建并启动第三个节点，172.17.0.3是第一个节点的IP</span></span><br><span class="line">docker run -d --name=consul-node3 -p 8502:8500 -e CONSUL_BIND_INTERFACE=eth0 consul:1.10 agent -dev -join=172.17.0.3</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">在第一个容器中运行consul命令来查询集群中的所有成员</span></span><br><span class="line">docker exec -t consul-node1 consul members</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>目录说明</p>
+<ul>
+<li>/consul/data：Consul 存放数据的目录</li>
+<li>/consul/config：Consul 存放配置文件的目录</li>
+</ul>
+</li>
+</ul>
+<h3 id="8-Minio（块存储）"><a href="#8-Minio（块存储）" class="headerlink" title="8 Minio（块存储）"></a>8 Minio（块存储）</h3><p><a target="_blank" rel="noopener" href="http://docs.minio.org.cn/docs/master/minio-erasure-code-quickstart-guide">http://docs.minio.org.cn/docs/master/minio-erasure-code-quickstart-guide</a></p>
+<ul>
+<li>单机单节点运行</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">docker run -p 9000:9000 --name minio1 \</span><br><span class="line">  -e &quot;MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE&quot; \</span><br><span class="line">  -e &quot;MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&quot; \</span><br><span class="line">  -v /mnt/data:/data \</span><br><span class="line">  -v /mnt/config:/root/.minio \</span><br><span class="line">  minio/minio server /data</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>以纠删码模式运行Minio (8个盘)</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">docker run -p 9000:9000 --name minio \</span><br><span class="line">  -v /mnt/data1:/data1 \</span><br><span class="line">  -v /mnt/data2:/data2 \</span><br><span class="line">  -v /mnt/data3:/data3 \</span><br><span class="line">  -v /mnt/data4:/data4 \</span><br><span class="line">  -v /mnt/data5:/data5 \</span><br><span class="line">  -v /mnt/data6:/data6 \</span><br><span class="line">  -v /mnt/data7:/data7 \</span><br><span class="line">  -v /mnt/data8:/data8 \</span><br><span class="line">  minio/minio:latest server --console-address &quot;:9999&quot; /data1 /data2 /data3 /data4 /data5 /data6 /data7 /data8</span><br></pre></td></tr></table></figure>
+
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/Docker/" rel="tag"># Docker</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/11/25/git-submodule%E5%85%A5%E5%9D%91%E6%8C%87%E5%8D%97/" rel="prev" title="git submodule入坑指南">
+      <i class="fa fa-chevron-left"></i> git submodule入坑指南
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/02/08/GIT%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86/" rel="next" title="GIT开发流程梳理">
+      GIT开发流程梳理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-MongoDB-%E6%9C%AC%E5%9C%B0%E6%9C%8D%E5%8A%A1"><span class="nav-number">1.</span> <span class="nav-text">1. MongoDB 本地服务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-%E5%88%9B%E5%BB%BAMongoDB%E5%AE%B9%E5%99%A8%E5%AE%9E%E4%BE%8B"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 创建MongoDB容器实例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-MongoDB%E5%86%85%E7%BD%AE%E7%94%A8%E6%88%B7%E8%A7%92%E8%89%B2"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 MongoDB内置用户角色</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Redis%E6%9C%AC%E5%9C%B0%E6%9C%8D%E5%8A%A1"><span class="nav-number">2.</span> <span class="nav-text">2. Redis本地服务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-%E5%88%9B%E5%BB%BA%E5%AE%B9%E5%99%A8%E5%AE%9E%E4%BE%8B"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 创建容器实例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Mysql%E3%80%81mariadb%E6%9C%AC%E5%9C%B0%E6%9C%8D%E5%8A%A1"><span class="nav-number">3.</span> <span class="nav-text">3. Mysql、mariadb本地服务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-%E5%88%9B%E5%BB%BA%E5%AE%B9%E5%99%A8%E5%AE%9E%E4%BE%8B"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 创建容器实例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-swagger"><span class="nav-number">4.</span> <span class="nav-text">4. swagger</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-rabbitMq"><span class="nav-number">5.</span> <span class="nav-text">5 rabbitMq</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-postgresql"><span class="nav-number">6.</span> <span class="nav-text">6. postgresql</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-Consul"><span class="nav-number">7.</span> <span class="nav-text">7.  Consul</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-Minio%EF%BC%88%E5%9D%97%E5%AD%98%E5%82%A8%EF%BC%89"><span class="nav-number">8.</span> <span class="nav-text">8 Minio（块存储）</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Nutao"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Nutao</p>
+  <div class="site-description" itemprop="description">No Pains, No Gains!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/nutao" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;nutao" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://zhuanlan.zhihu.com/ubuntu-learn" title="知乎专栏 → https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;ubuntu-learn" rel="noopener" target="_blank"><i class="fa fa-podcast fa-fw"></i>知乎专栏</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Nutao</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"nutao.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="1. 目的为了有效的帮助团队更简洁，更统一的管理好源码。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GIT开发流程梳理">
+<meta property="og:url" content="https://nutao.github.io/2023/02/08/GIT%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86/index.html">
+<meta property="og:site_name" content="Nutao">
+<meta property="og:description" content="1. 目的为了有效的帮助团队更简洁，更统一的管理好源码。">
+<meta property="og:locale">
+<meta property="og:image" content="https://nutao.github.io/2023/02/08/GIT%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86/1.png">
+<meta property="og:image" content="https://nutao.github.io/2023/02/08/GIT%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86/2.png">
+<meta property="article:published_time" content="2023-02-08T07:13:56.000Z">
+<meta property="article:modified_time" content="2023-02-08T07:13:56.000Z">
+<meta property="article:author" content="Nutao">
+<meta property="article:tag" content="git">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://nutao.github.io/2023/02/08/GIT%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86/1.png">
+
+<link rel="canonical" href="https://nutao.github.io/2023/02/08/GIT%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>GIT开发流程梳理 | Nutao</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Nutao</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://nutao.github.io/2023/02/08/GIT%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Nutao">
+      <meta itemprop="description" content="No Pains, No Gains!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Nutao">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          GIT开发流程梳理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-02-08 15:13:56" itemprop="dateCreated datePublished" datetime="2023-02-08T15:13:56+08:00">2023-02-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/git/" itemprop="url" rel="index"><span itemprop="name">git</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="1-目的"><a href="#1-目的" class="headerlink" title="1. 目的"></a>1. 目的</h1><p>为了有效的帮助团队更简洁，更统一的管理好源码。</p>
+<span id="more"></span>
+
+<h1 id="2-分支说明"><a href="#2-分支说明" class="headerlink" title="2. 分支说明"></a>2. 分支说明</h1><blockquote>
+<p> 源码仓库的分支按照生命周期分为：</p>
+</blockquote>
+<ul>
+<li><p>长期分支：<code>master</code>, <code>dev</code></p>
+</li>
+<li><p>临时分支：<code>feature/*</code>, <code>release/*</code>, <code>hotfix/*</code></p>
+</li>
+</ul>
+<blockquote>
+<p>源码仓库的分支按照用途又可分为：</p>
+</blockquote>
+<ul>
+<li><p>发布/预发布分支：<code>master</code>，<code>release/*</code></p>
+</li>
+<li><p>开发分支：<code>dev</code></p>
+</li>
+<li><p>功能分支：<code>feature/*</code></p>
+</li>
+<li><p>热修复分支：<code>hotfix/*</code></p>
+</li>
+</ul>
+<h2 id="分支用途"><a href="#分支用途" class="headerlink" title="分支用途"></a>分支用途</h2><ul>
+<li><code>master</code>：作为发布分支，与生产环境保持一致。在生产环境上发现的问题，必须以 <code>master</code> 为基准创建 <code>hotfix/*</code> 分支来修复问题。</li>
+<li><code>dev</code>：作为开发分支，所有最新的功能都在该分支下进行开发，<code>dev</code> 也是所有分支中功能最全，代码最新的一个分支。</li>
+<li><code>feature/*</code>：命名规则<code>feature/功能_版本号_日期_开发人员</code>，作为新功能的开发分支，只能从 <code>dev</code> 创建，开发完毕并经过测试之后必须重新合并到 <code>dev</code>。命名示例  <code>feature/xxx_v2.4.0_0507_lanffy</code> 作为开发分支，xxx是分支具体包含的功能，v2.4.0固定，0507是分支创建日期，lanffy是创建人。</li>
+<li><code>release/*</code>：命名规则<code>release/v+发布的版本号</code>，作为预发布分支，只能从 <code>dev</code> 创建。如果在预发布过程中发现了问题，在 <code>release/*</code> 分支上进行修改。同时，release/* 分支在每个迭代需要保留，作为后续ISV、定制开发的版本基线。</li>
+<li><code>hotfix/*</code>：命名规则<code>hotfix/v+bug修复的版本号</code>，作为热修复分支，只能从 <code>master</code> 分离出来。仅用于修复在生产环境上发现的 bug，修复完成并测试通过后需要将该分支合并回 <code>dev</code> 及 <code>master</code> 上，并删除该分支。</li>
+</ul>
+<h2 id="分支保护"><a href="#分支保护" class="headerlink" title="分支保护"></a>分支保护</h2><ul>
+<li>通用策略：<code>master</code>分支由管理角色Master负责管理，其他人员无权限修改。</li>
+</ul>
+<h1 id="3-工作流程"><a href="#3-工作流程" class="headerlink" title="3. 工作流程"></a>3. 工作流程</h1><h2 id="3-1-功能开发"><a href="#3-1-功能开发" class="headerlink" title="3.1 功能开发"></a>3.1 功能开发</h2><p><img src="/2023/02/08/GIT%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86/1.png" alt="image-20210712142153480"></p>
+<h3 id="标准流程"><a href="#标准流程" class="headerlink" title="标准流程"></a>标准流程</h3><ol>
+<li>建议每一个功能分支<code>feature/*</code>应与TAPD上的feature有明确的对应关系</li>
+<li>首先从<code>dev</code>拉取最新的分支，然后以最新的 dev 为基准创建新的功能分支，以<code>feature/f1</code>为例：</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git pull origin dev</span><br><span class="line">git checkout -b feature/f1 dev</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>开发人员在各自的功能分支上进行开发自测工作。</li>
+<li>当前功能分支开发完之后，在代码仓库中提起MR（Merge Request），申请将feature合并回dev分支。</li>
+<li>MR Code Reviewer代码审查通过后，合并代码，于界面勾选删除feature/f1分支。（如未勾选删除源分支，则手动删除特性分支）</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch -d feature/f1</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-2-发布与预发布"><a href="#3-2-发布与预发布" class="headerlink" title="3.2 发布与预发布"></a>3.2 发布与预发布</h2><p><img src="/2023/02/08/GIT%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86/2.png" alt="image-20210712155050843"></p>
+<h3 id="标准流程-1"><a href="#标准流程-1" class="headerlink" title="标准流程"></a>标准流程</h3><p>提交到预发布和生产环境应遵循以下流程：</p>
+<ol>
+<li>从 dev 分支创建新的预发布分支 <code>release/v0.1.0</code>，并部署到预发布环境上测试。在预发布过程中发现问题则直接在 <code>release/v0.1.0</code> 上进行修复</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b release/v0.1.0 dev</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>预发布分支 <code>release/v0.1.0</code> 在预发布环境中完全测试通过，可以部署到生产环境。但在部署到生产环境之前，需要将分支合并回 <code>dev</code> 及 <code>master</code>，并打一个正式发布版本的 tag v0.1.0，最后删除 <code>release/v0.1.0</code></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">git checkout dev</span><br><span class="line">git merge --no-ff release/v0.1.0</span><br><span class="line">git checkout master</span><br><span class="line">git merge --no-ff release/v0.1.0</span><br><span class="line">git tag v0.1.0</span><br><span class="line">git branch -d release/v0.1.0</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><strong>特别注意</strong>：功能 f2 已经合并到<code>dev</code>，但此时已经存在新功能 f1 的预发布分支 <code>release/v0.1.0</code>，所以需要等待其发布完成之后才能创建预发布分支 <code>release/v0.2.0</code></li>
+</ol>
+<p>生产环境发现Bug，需要Hotfix时应遵循以下流程：</p>
+<ol>
+<li>从 master 上分离出一个热修复分支 <code>hotfix/v0.1.1</code>，在此分支修复</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b hotfix/v0.1.1 master</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>验证通过之后，首先将分支重新合并回 <code>dev</code> 及 <code>master</code>，然后在 <code>master</code> 上打一个热修复 tag v0.1.1，最后删除 <code>hotfix/v0.1.1</code></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">git checkout dev</span><br><span class="line">git merge --no-ff hotfix/v0.1.1</span><br><span class="line">git checkout master</span><br><span class="line">git merge --no-ff hotfix/v0.1.1</span><br><span class="line">git tag v0.1.1</span><br><span class="line">git branch -d hotfix/v0.1.</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-提交与合并"><a href="#4-提交与合并" class="headerlink" title="4. 提交与合并"></a>4. 提交与合并</h1><h2 id="4-1-Git-commit-message"><a href="#4-1-Git-commit-message" class="headerlink" title="4.1 Git commit message"></a>4.1 Git commit message</h2><p>遵循 <a target="_blank" rel="noopener" href="http://git-scm.com/book/zh/v2/%E5%88%86%E5%B8%83%E5%BC%8F-Git-%E5%90%91%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%B4%A1%E7%8C%AE">Git 官方使用手册</a> 中给出的 commit 书写规范：</p>
+<blockquote>
+<p>本次提交 commit 的摘要（50 个字符或更少）</p>
+</blockquote>
+<blockquote>
+<p>如果必要的话，加入更详细的解释文字。在大概 72 个字符的时候换行。在某些情形下，第一行被当作一封电子邮件的标题，剩下的文本作为正文。分隔摘要与正文的空行是必须的（除非你完全省略正文）；如果你将两者混在一起，那么类似变基等工具无法正常工作。</p>
+</blockquote>
+<blockquote>
+<p>空行接着更进一步的段落。</p>
+</blockquote>
+<h3 id="最佳实践"><a href="#最佳实践" class="headerlink" title="最佳实践"></a>最佳实践</h3><p>每次提交建议添加关键词前缀，用于指示本次改动的主题：</p>
+<ul>
+<li>feat: 新功能（feature）</li>
+<li>fix: 修补 bug</li>
+<li>docs: 文档（documentation）</li>
+<li>style: 格式（不影响代码运行的变动）</li>
+<li>refactor: 重构（即不是新增功能，也不是修改 bug 的代码变动）</li>
+<li>perf: 性能优化</li>
+<li>test: 增加测试</li>
+<li>build: 编译相关的修改（例如 webpack, npm, gulp 等）</li>
+<li>ci: CI 相关的修改（例如 Travis, Circle 等）</li>
+<li>chore: 构建过程或辅助工具的变动</li>
+<li>revert: 回滚上一次 commit</li>
+</ul>
+<h2 id="4-2-Merge-Request-MR"><a href="#4-2-Merge-Request-MR" class="headerlink" title="4.2 Merge Request (MR)"></a>4.2 Merge Request (MR)</h2><ul>
+<li>建议在提交时需在标题中添加 <code>[MR]</code> 前缀用于邮件推送时区分 MR 和 ISSUE.</li>
+<li>每个 MR 应该仅包含针对单一主题的一系列变更，不要在一个 MR 中包含多个主题。举例来说：假设你开发了 X 和 Y 两个不同主题的相关内容，若此时将所有 commit 以同一 MR 的形式进行提交，如若 Reviewer 仅认可与 X 相关的变更但不同意 Y 主题的相关变更——这将导致我们将无法对此 MR 进行合并操作。</li>
+<li>每个 MR 提交人必须指定一名 Code Reviewer 进行代码审查，并由 Code Reviewer 进行合并。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/git/" rel="tag"># git</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/09/07/docker-db%E7%AE%80%E5%8D%95%E9%85%8D%E7%BD%AE/" rel="prev" title="docker-db简单配置">
+      <i class="fa fa-chevron-left"></i> docker-db简单配置
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/02/08/%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2minikube/" rel="next" title="本地部署minikube">
+      本地部署minikube <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E7%9B%AE%E7%9A%84"><span class="nav-number">1.</span> <span class="nav-text">1. 目的</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E5%88%86%E6%94%AF%E8%AF%B4%E6%98%8E"><span class="nav-number">2.</span> <span class="nav-text">2. 分支说明</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%94%AF%E7%94%A8%E9%80%94"><span class="nav-number">2.1.</span> <span class="nav-text">分支用途</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%94%AF%E4%BF%9D%E6%8A%A4"><span class="nav-number">2.2.</span> <span class="nav-text">分支保护</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">3. 工作流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-%E5%8A%9F%E8%83%BD%E5%BC%80%E5%8F%91"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 功能开发</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E5%87%86%E6%B5%81%E7%A8%8B"><span class="nav-number">3.1.1.</span> <span class="nav-text">标准流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-%E5%8F%91%E5%B8%83%E4%B8%8E%E9%A2%84%E5%8F%91%E5%B8%83"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 发布与预发布</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E5%87%86%E6%B5%81%E7%A8%8B-1"><span class="nav-number">3.2.1.</span> <span class="nav-text">标准流程</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-%E6%8F%90%E4%BA%A4%E4%B8%8E%E5%90%88%E5%B9%B6"><span class="nav-number">4.</span> <span class="nav-text">4. 提交与合并</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-Git-commit-message"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 Git commit message</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5"><span class="nav-number">4.1.1.</span> <span class="nav-text">最佳实践</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-Merge-Request-MR"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 Merge Request (MR)</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Nutao"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Nutao</p>
+  <div class="site-description" itemprop="description">No Pains, No Gains!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/nutao" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;nutao" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://zhuanlan.zhihu.com/ubuntu-learn" title="知乎专栏 → https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;ubuntu-learn" rel="noopener" target="_blank"><i class="fa fa-podcast fa-fw"></i>知乎专栏</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Nutao</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
