@@ -1,5 +1,5 @@
 ---
-title: 'Docker入门（一）：初识Docker'
+title: 'Docker入门一：初识Docker'
 date: 2023-06-12 09:20:24
 tags:
     - Docker
@@ -8,11 +8,9 @@ categories:
     - Docker
 ---
 
-[toc]
-
 Docker利用Linux的资源隔离机制（容器化），允许用户将**应用本身及运行所需要的全部环境依赖**封装在image镜像中，并可以通过镜像仓库来**分发标准化的部署制品**，所有获取到制品的人通过Docker部署都将能够**获得一致的部署结果**。
 
-![docker-architecture](./Docker入门（一）/docker-architecture.svg)
+![docker-architecture](./Docker入门一/docker-architecture.svg)
 
 > *From: [microsoft-learn](https://learn.microsoft.com/zh-cn/training/modules/intro-to-docker-containers/media/2-docker-architecture.svg)*
 
@@ -35,7 +33,7 @@ VM与容器的架构对比：
 
 传统的虚拟化方案（左），需要在主机部署监控程序。同时，每一个VM都有完整的OS支持，需要CPU、磁盘、网络管理、进程调度、内存管理等额外的花销。而使用容器化方案（右），则可以释放这些资源。
 
-![Docker VS VM](./Docker入门（一）/docker.svg)
+![Docker VS VM](./Docker入门一/docker.svg)
 
 > *From: [microsoft-learn](https://learn.microsoft.com/zh-cn/training/modules/intro-to-docker-containers/media/5-multiple-app-isolation.svg)*
 
@@ -57,7 +55,7 @@ VM与容器的架构对比：
 
 docker命令工具或者Docker Desktop（GUI）程序。通过命令或Rest API与Docker Server交互，进行容器镜像拉取、镜像构建、容器启停、状态展示等。
 
-![](./Docker入门（一）/docker-container-lifecycle-2.png)
+![](./Docker入门一/docker-container-lifecycle-2.png)
 
 > *FROM: [Microsoft-learn](https://learn.microsoft.com/zh-cn/training/modules/intro-to-docker-containers/media/4-docker-container-lifecycle-2.png)*
 
@@ -73,7 +71,7 @@ docker镜像是包含应用及完整运行环境的可移植程序包。通过Do
 
 Docker 可以通过从 Dockerfile 读取指令来自动构建镜像。
 
-Dockerfile 是一个文本文档，其中包含Build镜像调用的所有命令。
+Dockerfile 是一个文本文档，其中包含Build镜像调用的所有命令。每执行一行指令，Docker镜像就会增加一层。
 
 
 
@@ -97,7 +95,7 @@ CMD ["nginx","-g","daemon off;"]
 docker build -t nginx:v1 .
 ```
 
-![](./Docker入门（一）/build.PNG)
+![](./Docker入门一/build.PNG)
 
 ## 2.4 Docker 容器（Container）
 
@@ -109,7 +107,7 @@ docker run -p 8080:80 --name ng --rm nginx:v1
 
 关于镜像和容器在文件系统中存储方式，可以参考下图：
 
-![unionfs](./Docker入门（一）/unionfs-diagram.svg)
+![unionfs](./Docker入门一/unionfs-diagram.svg)
 
 > *From: [microsoft-learn](https://learn.microsoft.com/zh-cn/training/modules/intro-to-docker-containers/media/3-unionfs-diagram.svg)*
 
