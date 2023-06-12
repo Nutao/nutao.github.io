@@ -19,33 +19,36 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"nutao.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.17.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-1}},"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="Docker 是一个用于开发、交付和运行容器的容器化平台。它利用容器技术，将应用程序及其依赖的库、框架、工具等封装在一个虚拟化的容器中，使得应用程序可以在任意环境中运行，并能够快速地进行部署、扩展和管理。利用容器技术，将应用程序及其依赖的库、框架、工具等封装在一个虚拟化的容器中，使得应用程序可以在任意环境中运行，并能够快速地进行部署、扩展和管理。声明：上述介绍由chatGPT生成 From: mi">
+    <meta name="description" content="Docker利用Linux的资源隔离机制（容器化），允许用户将应用本身及运行所需要的全部环境依赖封装在image镜像中，并可以通过镜像仓库来分发标准化的部署制品，所有获取到制品的人通过Docker部署都将能够获得一致的部署结果。   From: microsoft-learn">
 <meta property="og:type" content="article">
-<meta property="og:title" content="WSL2: Docker Desktop for Windows">
-<meta property="og:url" content="https://nutao.github.io/2023/06/12/WSL2-Docker-Desktop-for-Windows/index.html">
+<meta property="og:title" content="Docker入门一：初识Docker">
+<meta property="og:url" content="https://nutao.github.io/2023/06/12/Docker%E5%85%A5%E9%97%A8%E4%B8%80/index.html">
 <meta property="og:site_name" content="Nutao">
-<meta property="og:description" content="Docker 是一个用于开发、交付和运行容器的容器化平台。它利用容器技术，将应用程序及其依赖的库、框架、工具等封装在一个虚拟化的容器中，使得应用程序可以在任意环境中运行，并能够快速地进行部署、扩展和管理。利用容器技术，将应用程序及其依赖的库、框架、工具等封装在一个虚拟化的容器中，使得应用程序可以在任意环境中运行，并能够快速地进行部署、扩展和管理。声明：上述介绍由chatGPT生成 From: mi">
+<meta property="og:description" content="Docker利用Linux的资源隔离机制（容器化），允许用户将应用本身及运行所需要的全部环境依赖封装在image镜像中，并可以通过镜像仓库来分发标准化的部署制品，所有获取到制品的人通过Docker部署都将能够获得一致的部署结果。   From: microsoft-learn">
 <meta property="og:locale">
-<meta property="og:image" content="https://nutao.github.io/2023/06/12/WSL2-Docker-Desktop-for-Windows/docker-architecture.svg">
+<meta property="og:image" content="https://nutao.github.io/2023/06/12/Docker%E5%85%A5%E9%97%A8%E4%B8%80/docker-architecture.svg">
+<meta property="og:image" content="https://nutao.github.io/2023/06/12/Docker%E5%85%A5%E9%97%A8%E4%B8%80/docker.svg">
+<meta property="og:image" content="https://learn.microsoft.com/zh-cn/training/modules/intro-to-docker-containers/media/3-container-ubuntu-host-os.svg">
+<meta property="og:image" content="https://nutao.github.io/2023/06/12/Docker%E5%85%A5%E9%97%A8%E4%B8%80/docker-container-lifecycle-2.png">
+<meta property="og:image" content="https://nutao.github.io/2023/06/12/Docker%E5%85%A5%E9%97%A8%E4%B8%80/build.PNG">
+<meta property="og:image" content="https://nutao.github.io/2023/06/12/Docker%E5%85%A5%E9%97%A8%E4%B8%80/unionfs-diagram.svg">
 <meta property="article:published_time" content="2023-06-12T01:20:24.000Z">
 <meta property="article:modified_time" content="2023-06-12T01:20:24.000Z">
 <meta property="article:author" content="Nutao">
 <meta property="article:tag" content="Linux">
 <meta property="article:tag" content="Docker">
-<meta property="article:tag" content="WSL2">
-<meta property="article:tag" content="Windows11">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://nutao.github.io/2023/06/12/WSL2-Docker-Desktop-for-Windows/docker-architecture.svg">
+<meta name="twitter:image" content="https://nutao.github.io/2023/06/12/Docker%E5%85%A5%E9%97%A8%E4%B8%80/docker-architecture.svg">
 
 
-<link rel="canonical" href="https://nutao.github.io/2023/06/12/WSL2-Docker-Desktop-for-Windows/">
+<link rel="canonical" href="https://nutao.github.io/2023/06/12/Docker%E5%85%A5%E9%97%A8%E4%B8%80/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://nutao.github.io/2023/06/12/WSL2-Docker-Desktop-for-Windows/","path":"2023/06/12/WSL2-Docker-Desktop-for-Windows/","title":"WSL2: Docker Desktop for Windows"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://nutao.github.io/2023/06/12/Docker%E5%85%A5%E9%97%A8%E4%B8%80/","path":"2023/06/12/Docker入门一/","title":"Docker入门一：初识Docker"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>WSL2: Docker Desktop for Windows | Nutao</title>
+<title>Docker入门一：初识Docker | Nutao</title>
   
 
 
@@ -131,7 +134,7 @@
   
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           Table of Contents
@@ -144,6 +147,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E3%80%81Why-Docker"><span class="nav-number">1.</span> <span class="nav-text">一、Why Docker?</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E3%80%81What-is-Docker%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">二、What is Docker？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-Docker%E5%BA%94%E7%94%A8%E7%BB%84%E4%BB%B6"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 Docker应用组件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-Docker-%E9%95%9C%E5%83%8F%EF%BC%88Image%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 Docker 镜像（Image）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-Dockerfile"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 Dockerfile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-Docker-%E5%AE%B9%E5%99%A8%EF%BC%88Container%EF%BC%89"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 Docker 容器（Container）</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -207,7 +211,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://nutao.github.io/2023/06/12/WSL2-Docker-Desktop-for-Windows/">
+    <link itemprop="mainEntityOfPage" href="https://nutao.github.io/2023/06/12/Docker%E5%85%A5%E9%97%A8%E4%B8%80/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -220,12 +224,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="WSL2: Docker Desktop for Windows | Nutao">
+      <meta itemprop="name" content="Docker入门一：初识Docker | Nutao">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          WSL2: Docker Desktop for Windows
+          Docker入门一：初识Docker
         </h1>
 
         <div class="post-meta-container">
@@ -244,7 +248,7 @@
       </span>
       <span class="post-meta-item-text">In</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/WSL2/" itemprop="url" rel="index"><span itemprop="name">WSL2</span></a>
+          <a href="/categories/Docker/" itemprop="url" rel="index"><span itemprop="name">Docker</span></a>
         </span>
     </span>
 
@@ -264,9 +268,64 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><p>Docker 是一个用于开发、交付和运行容器的容器化平台。它利用容器技术，将应用程序及其依赖的库、框架、工具等封装在一个虚拟化的容器中，使得应用程序可以在任意环境中运行，并能够快速地进行部署、扩展和管理。利用容器技术，将应用程序及其依赖的库、框架、工具等封装在一个虚拟化的容器中，使得应用程序可以在任意环境中运行，并能够快速地进行部署、扩展和管理。<em>声明：上述介绍由chatGPT生成</em></p>
-<p><img src="/2023/06/12/WSL2-Docker-Desktop-for-Windows/docker-architecture.svg" alt="docker-architecture"><br><em>From: <a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/training/modules/intro-to-docker-containers/media/2-docker-architecture.svg">microsoft-learn</a></em></p>
+    <div class="post-body" itemprop="articleBody"><p>Docker利用Linux的资源隔离机制（容器化），允许用户将<strong>应用本身及运行所需要的全部环境依赖</strong>封装在image镜像中，并可以通过镜像仓库来<strong>分发标准化的部署制品</strong>，所有获取到制品的人通过Docker部署都将能够<strong>获得一致的部署结果</strong>。</p>
+<p><img src="/2023/06/12/Docker%E5%85%A5%E9%97%A8%E4%B8%80/docker-architecture.svg" alt="docker-architecture"></p>
+<blockquote>
+<p><em>From: <a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/training/modules/intro-to-docker-containers/media/2-docker-architecture.svg">microsoft-learn</a></em></p>
+</blockquote>
 <span id="more"></span>
+
+
+
+<h1 id="一、Why-Docker"><a href="#一、Why-Docker" class="headerlink" title="一、Why Docker?"></a>一、Why Docker?</h1><p>使用Docker可以解决的问题：</p>
+<ul>
+<li><strong>应用可移植性</strong>：Docker镜像包含了应用程序及所需依赖，可以轻松移植到任何支持Docker的环境</li>
+<li><strong>托管环境管理</strong>：本地环境、开发环境、生产环境或者云存在各种型号的硬件或软件。通过标准的Docker部署镜像，可以保证一致的部署环境。</li>
+<li><strong>软件交付连续性</strong>：几乎所有的互联网公司、运营数据中心的公司及部分技术驱动企业都在使用Pipeline，将应用程序的打包、测试和部署与Docker容器结合起来，保证交付的连续性。</li>
+<li><strong>高效利用基础设施</strong>：通过虚拟化/容器化方案，可以隔离底层的异构架构，统一上层的运行环境。</li>
+</ul>
+<p>VM与容器的架构对比：</p>
+<p>传统的虚拟化方案（左），需要在主机部署监控程序。同时，每一个VM都有完整的OS支持，需要CPU、磁盘、网络管理、进程调度、内存管理等额外的花销。而使用容器化方案（右），则可以释放这些资源。</p>
+<p><img src="/2023/06/12/Docker%E5%85%A5%E9%97%A8%E4%B8%80/docker.svg" alt="Docker VS VM"></p>
+<blockquote>
+<p><em>From: <a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/training/modules/intro-to-docker-containers/media/5-multiple-app-isolation.svg">microsoft-learn</a></em></p>
+</blockquote>
+<h1 id="二、What-is-Docker？"><a href="#二、What-is-Docker？" class="headerlink" title="二、What is Docker？"></a>二、What is Docker？</h1><p>需要注意的是：在 Linux 上运行的 Docker 容器会共享主机操作系统内核。</p>
+<p><img src="https://learn.microsoft.com/zh-cn/training/modules/intro-to-docker-containers/media/3-container-ubuntu-host-os.svg" alt="显示具有 Ubuntu 基本 OS 且依赖于主机 OS 内核的 Docker 映像的关系图。"></p>
+<h2 id="2-1-Docker应用组件"><a href="#2-1-Docker应用组件" class="headerlink" title="2.1 Docker应用组件"></a>2.1 Docker应用组件</h2><p>一个典型的Docker安装包，包含如下组件：</p>
+<blockquote>
+<p>Docker Server</p>
+</blockquote>
+<p>一个名为dockerd的后台守护进程（Windows Desktop版本进程命名可能存在一些差异），它可以通过API与客户端进行交互。并且可以管理容器的生命周期。</p>
+<blockquote>
+<p>Docker Client</p>
+</blockquote>
+<p>docker命令工具或者Docker Desktop（GUI）程序。通过命令或Rest API与Docker Server交互，进行容器镜像拉取、镜像构建、容器启停、状态展示等。</p>
+<p><img src="/2023/06/12/Docker%E5%85%A5%E9%97%A8%E4%B8%80/docker-container-lifecycle-2.png" alt></p>
+<blockquote>
+<p><em>FROM: <a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/training/modules/intro-to-docker-containers/media/4-docker-container-lifecycle-2.png">Microsoft-learn</a></em></p>
+</blockquote>
+<h2 id="2-2-Docker-镜像（Image）"><a href="#2-2-Docker-镜像（Image）" class="headerlink" title="2.2 Docker 镜像（Image）"></a>2.2 Docker 镜像（Image）</h2><p>docker镜像是包含应用及完整运行环境的可移植程序包。通过DockerFile build生成的镜像不可更改（可追加Layer），这个特性可以保证开发环境和生产环境的部署制品（镜像）是一致的。</p>
+<p>通常，我们会部署一个镜像仓库来管理和存储应用程序不同版本的镜像。公共的镜像仓库如DockerHub。</p>
+<p>有关镜像更多的描述见官网：<a target="_blank" rel="noopener" href="https://docs.docker.com/build/guide/">Build with Docker | Docker Documentation</a></p>
+<h2 id="2-3-Dockerfile"><a href="#2-3-Dockerfile" class="headerlink" title="2.3 Dockerfile"></a>2.3 Dockerfile</h2><p>Docker 可以通过从 Dockerfile 读取指令来自动构建镜像。</p>
+<p>Dockerfile 是一个文本文档，其中包含Build镜像调用的所有命令。每执行一行指令，Docker镜像就会增加一层。</p>
+<p>例如一个构建Nginx镜像的Dockerfile：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 基础镜像</span></span><br><span class="line"><span class="keyword">FROM</span> ubuntu:latest</span><br><span class="line"><span class="keyword">MAINTAINER</span> nutao</span><br><span class="line"><span class="comment"># 安装nginx</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> apt-get update &amp;&amp; apt-get install -y nginx</span></span><br><span class="line"><span class="comment"># 开放80端口</span></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">80</span></span><br><span class="line"><span class="comment"># 启动命令</span></span><br><span class="line"><span class="keyword">CMD</span><span class="language-bash"> [<span class="string">&quot;nginx&quot;</span>,<span class="string">&quot;-g&quot;</span>,<span class="string">&quot;daemon off;&quot;</span>]</span></span><br></pre></td></tr></table></figure>
+
+<p>在本地build镜像：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build -t nginx:v1 .</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2023/06/12/Docker%E5%85%A5%E9%97%A8%E4%B8%80/build.PNG" alt></p>
+<h2 id="2-4-Docker-容器（Container）"><a href="#2-4-Docker-容器（Container）" class="headerlink" title="2.4 Docker 容器（Container）"></a>2.4 Docker 容器（Container）</h2><p>这是一个抽象的概念。将Docker镜像Run在指定的环境，这个Running的应用包，我们称之为容器。比如启动上文的nginx镜像：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -p 8080:80 --name ng --rm nginx:v1</span><br></pre></td></tr></table></figure>
+
+<p>关于镜像和容器在文件系统中存储方式，可以参考下图：</p>
+<p><img src="/2023/06/12/Docker%E5%85%A5%E9%97%A8%E4%B8%80/unionfs-diagram.svg" alt="unionfs"></p>
+<blockquote>
+<p><em>From: <a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/training/modules/intro-to-docker-containers/media/3-unionfs-diagram.svg">microsoft-learn</a></em></p>
+</blockquote>
+
     </div>
 
     
@@ -301,7 +360,7 @@
   </li>
   <li class="post-copyright-link">
       <strong>Post link: </strong>
-      <a href="https://nutao.github.io/2023/06/12/WSL2-Docker-Desktop-for-Windows/" title="WSL2: Docker Desktop for Windows">https://nutao.github.io/2023/06/12/WSL2-Docker-Desktop-for-Windows/</a>
+      <a href="https://nutao.github.io/2023/06/12/Docker%E5%85%A5%E9%97%A8%E4%B8%80/" title="Docker入门一：初识Docker">https://nutao.github.io/2023/06/12/Docker入门一/</a>
   </li>
   <li class="post-copyright-license">
       <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
@@ -329,8 +388,6 @@
           <div class="post-tags">
               <a href="/tags/Linux/" rel="tag"># Linux</a>
               <a href="/tags/Docker/" rel="tag"># Docker</a>
-              <a href="/tags/WSL2/" rel="tag"># WSL2</a>
-              <a href="/tags/Windows11/" rel="tag"># Windows11</a>
           </div>
 
         
@@ -426,7 +483,7 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.8.0/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
 
-<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"Nutao","repo":"nutao.github.io","client_id":"a523abddf48f801d3c7e","client_secret":"27b12d247f4db45b114a24dc85b2880b4970d23c","admin_user":"Nutao","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.8.0/gitalk.min.js","integrity":"sha256-MVK9MGD/XJaGyIghSVrONSnoXoGh3IFxLw0zfvzpxR4="},"path_md5":"96b6bf7333e40e20d9b5b8f651d1cb47"}</script>
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"Nutao","repo":"nutao.github.io","client_id":"a523abddf48f801d3c7e","client_secret":"27b12d247f4db45b114a24dc85b2880b4970d23c","admin_user":"Nutao","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.8.0/gitalk.min.js","integrity":"sha256-MVK9MGD/XJaGyIghSVrONSnoXoGh3IFxLw0zfvzpxR4="},"path_md5":"c03f34619a0f2794f412427e40eb7341"}</script>
 <script src="/js/third-party/comments/gitalk.js"></script>
 
 </body>
