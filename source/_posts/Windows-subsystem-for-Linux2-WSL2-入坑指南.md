@@ -4,15 +4,17 @@ date: 2023-06-05 21:36:43
 tags:
     - Ubuntu
     - Linux
+    - WSL2
+    - Windows11
 categories:
-    - Ubuntu
+    - WSL2
 comments: false
 ---
 
 ![WSL2](./Windows-subsystem-for-Linux2-WSL2-入坑指南/WSL2.png)
 
 WSL 2 是适用于 Linux 的 Windows 子系统体系结构的一个新版本，它支持适用于 Linux 的 Windows 子系统在 Windows 上运行 ELF64 Linux 二进制文件。相比于WSL1，WSL2 使用的是全新的体系结构，能够通过子系统方式运行**真正的 Linux内核**。
-<!-- more  -->
+
 <!-- more  -->
 
 
