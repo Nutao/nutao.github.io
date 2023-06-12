@@ -21,9 +21,9 @@ npm install hexo-deployer-git --save
 
 # download theme
 # git submodule init && git submodule update --remote
-git clone https://gitee.com/nutao/hexo-theme-next.git themes/next
+git clone git@github.com:Nutao/hexo-theme-next.git themes/next
 
 # configuratin
-cp ./themes/_config.yml themes/next/_config.yml
+cp ./themes/_config_new.yml themes/next/_config.yml
 
 echo "try hexo --version to check env"
