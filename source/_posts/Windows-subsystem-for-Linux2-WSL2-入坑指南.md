@@ -8,7 +8,6 @@ tags:
     - Windows11
 categories:
     - WSL2
-comments: false
 ---
 
 ![WSL2](./Windows-subsystem-for-Linux2-WSL2-入坑指南/WSL2.png)

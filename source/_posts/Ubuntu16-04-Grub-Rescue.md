@@ -6,7 +6,6 @@ tags:
     - Linux
 categories:
     - Ubuntu
-comments: false
 ---
 如果某一天, 你不小心扩展了一下你的 / 目录, 又忘记了更新 grub 引导. 不好意思, 你有麻烦了
 
