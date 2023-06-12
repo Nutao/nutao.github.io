@@ -1,49 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Docker-容器抓包</title>
-    <url>/2020/04/06/Docker-%E5%AE%B9%E5%99%A8%E6%8A%93%E5%8C%85/</url>
-    <content><![CDATA[<p>通常情况下，Linux可以通过tcpdump工具进行抓包。但是，在容器服务日趋盛行的今天，制品base镜像为减小体积，仅会包含必要的核心库和工具。给PaaS服务中容器的网络问题和定位，则需要通过名为 <code>nsenter</code> 的工具实现。</p>
-<span id="more"></span>
-
-
-<h2 id="nsenter简介"><a href="#nsenter简介" class="headerlink" title="nsenter简介"></a>nsenter简介</h2><p>nsenter 包含在绝大部分 Linux 发行版预置的 <code>util-linux</code> 工具包中。它可以进入指定进程的关联命名空间。包括</p>
-<ul>
-<li>文件命名空间（mount namespace）</li>
-<li>主机名命名空间（UTS namespace)</li>
-<li>IPC 命名空间（IPC namespace）</li>
-<li>网络命名空间（network namespace）</li>
-<li>进程命名空间（pid namespace）</li>
-<li>用户命名空间（user namespace）。</li>
-</ul>
-<p>通过进入到指定的命名空间，即可实现在宿主机shell中直接操作指定容器的网络接口，并进行抓包等操作。</p>
-<h2 id="使用nsenter抓包"><a href="#使用nsenter抓包" class="headerlink" title="使用nsenter抓包"></a>使用nsenter抓包</h2><ol>
-<li>获取容器Pid</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker inspect --format &quot;&#123;&#123;.State.Pid&#125;&#125;&quot; &lt;container id/name&gt;</span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li>切换当前shell的网络命名空间为指定容器网络命名空间</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-n 表示切换网络命名空间，-t 指定的 pid 为步骤 1 获取的容器的 root pid：</span></span><br><span class="line">nsenter -n -t &lt;container root id&gt;</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li>使用tcpdump对容器网络接口抓包</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-i指定网卡，示例为抓取80/tcp相关的包</span></span><br><span class="line">tcpdump -i eth0 tcp and port 80 -vvv</span><br></pre></td></tr></table></figure>
-
-
-<p>更多的nsenter使用，可以参考 <code>man nsenter</code>查阅工具的使用指南。</p>
-]]></content>
-      <categories>
-        <category>Docker</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>Docker</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>GIT开发流程梳理</title>
     <url>/2023/02/08/GIT%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86/</url>
     <content><![CDATA[<h1 id="1-目的"><a href="#1-目的" class="headerlink" title="1. 目的"></a>1. 目的</h1><p>为了有效的帮助团队更简洁，更统一的管理好源码。</p>
@@ -159,6 +116,49 @@
       </tags>
   </entry>
   <entry>
+    <title>Docker-容器抓包</title>
+    <url>/2020/04/06/Docker-%E5%AE%B9%E5%99%A8%E6%8A%93%E5%8C%85/</url>
+    <content><![CDATA[<p>通常情况下，Linux可以通过tcpdump工具进行抓包。但是，在容器服务日趋盛行的今天，制品base镜像为减小体积，仅会包含必要的核心库和工具。给PaaS服务中容器的网络问题和定位，则需要通过名为 <code>nsenter</code> 的工具实现。</p>
+<span id="more"></span>
+
+
+<h2 id="nsenter简介"><a href="#nsenter简介" class="headerlink" title="nsenter简介"></a>nsenter简介</h2><p>nsenter 包含在绝大部分 Linux 发行版预置的 <code>util-linux</code> 工具包中。它可以进入指定进程的关联命名空间。包括</p>
+<ul>
+<li>文件命名空间（mount namespace）</li>
+<li>主机名命名空间（UTS namespace)</li>
+<li>IPC 命名空间（IPC namespace）</li>
+<li>网络命名空间（network namespace）</li>
+<li>进程命名空间（pid namespace）</li>
+<li>用户命名空间（user namespace）。</li>
+</ul>
+<p>通过进入到指定的命名空间，即可实现在宿主机shell中直接操作指定容器的网络接口，并进行抓包等操作。</p>
+<h2 id="使用nsenter抓包"><a href="#使用nsenter抓包" class="headerlink" title="使用nsenter抓包"></a>使用nsenter抓包</h2><ol>
+<li>获取容器Pid</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker inspect --format &quot;&#123;&#123;.State.Pid&#125;&#125;&quot; &lt;container id/name&gt;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>切换当前shell的网络命名空间为指定容器网络命名空间</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-n 表示切换网络命名空间，-t 指定的 pid 为步骤 1 获取的容器的 root pid：</span></span><br><span class="line">nsenter -n -t &lt;container root id&gt;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>使用tcpdump对容器网络接口抓包</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-i指定网卡，示例为抓取80/tcp相关的包</span></span><br><span class="line">tcpdump -i eth0 tcp and port 80 -vvv</span><br></pre></td></tr></table></figure>
+
+
+<p>更多的nsenter使用，可以参考 <code>man nsenter</code>查阅工具的使用指南。</p>
+]]></content>
+      <categories>
+        <category>Docker</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Go map实现原理</title>
     <url>/2020/05/17/Go-map%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</url>
     <content><![CDATA[<p>与其他大多数常用的编程语言类似，Golang也内置了map数据结构，用于操作基于key-value的数据类型。Golang Map的实现原理可与Redis hash表对照学习。</p>
@@ -239,127 +239,49 @@
       </tags>
   </entry>
   <entry>
-    <title>Mongodb ReplicatSet 认证（KeyFile）</title>
-    <url>/2017/07/27/Mongodb-%E9%9B%86%E7%BE%A4%E8%AE%A4%E8%AF%81%EF%BC%88KeyFile%EF%BC%89/</url>
-    <content><![CDATA[<p>MongoDB 是由C++语言编写的，是一个基于分布式文件存储的开源数据库系统。在高负载的情况下，添加更多的节点，可以保证服务器性能。MongoDB的安全设置（<strong>特别是集群安全</strong>）一直是比较恼人的。那今天这篇文章就是来和大家聊聊使用Key File的ReplicatSet + User Role认证。</p>
+    <title>Golang错误与异常处理</title>
+    <url>/2020/05/17/Golang%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86/</url>
+    <content><![CDATA[<p>Golang错误类型使用error进行处理，而异常通常使用panic-recover进行处理。</p>
 <span id="more"></span>
 
-<h2 id="1-下载MongoDB并创建数据文件夹"><a href="#1-下载MongoDB并创建数据文件夹" class="headerlink" title="1. 下载MongoDB并创建数据文件夹"></a>1. 下载MongoDB并创建数据文件夹</h2><p>MongoDB的下载可以直接通过镜像源或者是去官网下载安装包的方式，这里就不再赘述了。默认大家都会下载和安装。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 配置文件夹</span></span><br><span class="line"><span class="built_in">mkdir</span> conf</span><br><span class="line"><span class="comment"># 日志文件夹</span></span><br><span class="line"><span class="built_in">mkdir</span> <span class="built_in">log</span></span><br><span class="line"><span class="comment"># 日志文件</span></span><br><span class="line"><span class="built_in">touch</span> <span class="built_in">log</span>/1.<span class="built_in">log</span></span><br><span class="line"><span class="comment"># 认证文件夹</span></span><br><span class="line"><span class="built_in">mkdir</span> key</span><br></pre></td></tr></table></figure>
+<h2 id="1-使用error处理错误"><a href="#1-使用error处理错误" class="headerlink" title="1. 使用error处理错误"></a>1. 使用error处理错误</h2><p>error类型是一个接口类型，自定义的错误类型也必须实现为 error 接口，可以通过 Error() 获取到具体的错误信息而不用关心错误的具体类型。<br>它的定义：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> <span class="type">error</span> <span class="keyword">interface</span> &#123;</span><br><span class="line">    Error() <span class="type">string</span>&#125;</span><br></pre></td></tr></table></figure>
 
-<h2 id="2-生成KeyFIle"><a href="#2-生成KeyFIle" class="headerlink" title="2. 生成KeyFIle"></a>2. 生成KeyFIle</h2><blockquote>
-<p>随机生成keyFile或者手动写入,key的长度必须是6-1024的base64字符，unix下必须相同组权限</p>
+<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">testSqrt</span><span class="params">(f <span class="type">float64</span>)</span></span>(<span class="type">float64</span>, <span class="type">error</span>)&#123;    </span><br><span class="line">    <span class="keyword">if</span> f &lt; <span class="number">0</span> &#123;         </span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>, errors.New(<span class="string">&quot;请输入正数&quot;</span>)    </span><br><span class="line">    &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">        sqrt := math.Sqrt(f)         </span><br><span class="line">        <span class="keyword">return</span> sqrt,<span class="literal">nil</span>    </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用标准库的 <code>fmt.Errorf</code> 和 <code>errors.New</code> 可以方便的创建 error 类型的变量。</p>
+<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><blockquote>
+<p>预定义错误值</p>
 </blockquote>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> key</span><br><span class="line">openssl rand -<span class="built_in">base64</span> 600 &gt; mongodb.key</span><br></pre></td></tr></table></figure>
-<ul>
-<li>查看内容</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">xV7Ilo4O3+GHb57LECdoQwJ2u5DrcUsgHhzfXRrvvRVsnDaGNpp3qOvlTm1p3PjC</span><br><span class="line">L8gkVAV2vG/L8yG+HdBYgbZ/cEW49tlj/CSuK7wd4g/E40jk3uJPb8nMyXsZk4W1</span><br><span class="line">6TAL/5Teq5mY4VqAnuY1JqfPwgIyOYMn9ZCs5Wv/htnYR2n14hiw4bXe2ADaiD42</span><br><span class="line">kn7QhbuXxQBHxx3Yb/KTlEBqAm0aOAAueSbDvDwcnrsxoEcMnWq9gAhxzNmh9nv7</span><br><span class="line">E3b7JqKn/jo+ZIrfAropvbz7JqcPIUp0yfDsrolIlvRn965Z/+3ZJMQgU/QrLNjY</span><br><span class="line">wNcj7SqMXoXikTCalLycIbSWymX9dCMjOJ259k/ieU3LlGtLvWmozFlsG/Yu50w+</span><br><span class="line">kQ3uIH1Rq8KH1Gg35dtjr8sbObD/W4KEelwdTm3WqJIRZVVu6CYkDjBeSpXPSnrx</span><br><span class="line">C+DnN4U7PEZ8O07MRDps/oXcK2dXv1FmaoeTnQ7BzLITc0FSAa8oT4llBN2rXzQn</span><br><span class="line">XXdlLoZ8H71Z0+OeD1/h9qGIYfB3bKWzeoPY2cd3b37lQe9a5UVPX+1GEyiut5kv</span><br><span class="line">LgF3dgJ99/VmSvzBCdgwiMOu0eNxBvedqFnchMtqth85WJRMIcS5p2Pa8z7Wkjav</span><br><span class="line">8wUdPDf4udv7b4x8cgEdv4kNB/PPtHTUTsP51Y0Zlds=</span><br></pre></td></tr></table></figure>
-<ul>
-<li>修改key的权限</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 这里的权限一定要比 600(rw) 低, 否则会报 Permission 太高的错误(在log中)</span></span><br><span class="line"><span class="built_in">chmod</span> 600 mongodb.key</span><br><span class="line"><span class="comment"># 查看权限</span></span><br><span class="line"><span class="built_in">ls</span> -l</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">-rw------- 1 root root 1085 Jul 26 16:03 mongodb.key</span><br></pre></td></tr></table></figure>
-<p><strong><code>将 keyFile 分发到每一个节点（如果是物理机）</code></strong></p>
-<h2 id="3-配置文件"><a href="#3-配置文件" class="headerlink" title="3. 配置文件"></a>3. 配置文件</h2><blockquote>
-<p>模板 mongod.conf</p>
-</blockquote>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># for documentation of all options, see:</span></span><br><span class="line"><span class="comment">#   http://docs.mongodb.org/manual/reference/configuration-options/</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Where and how to store data.</span></span><br><span class="line"><span class="attr">storage:</span></span><br><span class="line">  <span class="attr">dbPath:</span> <span class="string">/db/mongodb3/data</span></span><br><span class="line">  <span class="attr">journal:</span></span><br><span class="line">    <span class="attr">enabled:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">directoryPerDB:</span> <span class="literal">true</span></span><br><span class="line"><span class="comment">#  engine:</span></span><br><span class="line"><span class="comment">#  mmapv1:</span></span><br><span class="line"><span class="comment">#  wiredTiger:</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># where to write logging data.</span></span><br><span class="line"><span class="attr">systemLog:</span></span><br><span class="line">  <span class="attr">destination:</span> <span class="string">file</span></span><br><span class="line">  <span class="attr">logAppend:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">path:</span> <span class="string">/db/mongodb3/log/1.log</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># network interfaces</span></span><br><span class="line"><span class="attr">net:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">28017</span></span><br><span class="line"> <span class="comment"># bindIp: 127.0.0.1</span></span><br><span class="line"></span><br><span class="line"><span class="attr">processManagement:</span></span><br><span class="line">  <span class="attr">fork:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 指定keyFile后会自动开启auth</span></span><br><span class="line"><span class="attr">security:</span></span><br><span class="line">  <span class="attr">keyFile:</span> <span class="string">/db/mongodb3/key/key</span></span><br><span class="line"><span class="comment">#operationProfiling:</span></span><br><span class="line"></span><br><span class="line"><span class="attr">replication:</span></span><br><span class="line">  <span class="attr">replSetName:</span> <span class="string">DBTEST</span></span><br><span class="line">  <span class="attr">oplogSizeMB:</span> <span class="number">20480</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#sharding:</span></span><br><span class="line"><span class="comment">## Enterprise-Only Options:</span></span><br><span class="line"><span class="comment">#auditLog:</span></span><br><span class="line"><span class="comment">#snmp:</span></span><br></pre></td></tr></table></figure>
-
-<p><strong><code>注意:</code></strong></p>
-<ul>
-<li>所有的机器节点都要在防火墙上<strong>开启 mongodb 需要的端口</strong></li>
-<li>keyFile的路径, 以及各种参数的<strong><code>大小写</code></strong></li>
-<li>分片集或者复制集的<strong><code>每一个节点</code></strong>(物理或者虚拟)都要分开配置配置文件以及keyFile</li>
-</ul>
-<h2 id="3-启动"><a href="#3-启动" class="headerlink" title="3. 启动"></a>3. 启动</h2><p><strong><code>在每一个节点执行</code></strong></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 配置文件名自定（可以使用conf，yaml）</span></span><br><span class="line">mongod -f mongod.conf</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">about to fork child process, waiting until server is ready <span class="keyword">for</span> connections.</span><br><span class="line">forked process: 9221</span><br><span class="line">child process started successfully, parent exiting</span><br></pre></td></tr></table></figure>
-<h2 id="4-配置复制集"><a href="#4-配置复制集" class="headerlink" title="4. 配置复制集"></a>4. 配置复制集</h2><blockquote>
-<p>连接Mongo [<strong><code>任意一个节点</code></strong>]</p>
-</blockquote>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">mongo --port 28017</span><br></pre></td></tr></table></figure>
+<p>预定义全局的错误变量，方便在后续逻辑中进行对应的error判断。</p>
+<figure class="highlight golang"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">var</span> (</span><br><span class="line">    ErrInventoryInsufficient      = errors.New(<span class="string">&quot;product inventory insufficient&quot;</span>)</span><br><span class="line">    ErrProductSalesTerritoryLimit = errors.New(<span class="string">&quot;product sales torritory limit&quot;</span>)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">switch</span> err &#123;</span><br><span class="line">            <span class="keyword">case</span> service.ErrInventoryInsufficient:      <span class="comment">// handling</span></span><br><span class="line">            <span class="keyword">case</span> service.ErrProductSalesTerritoryLimit: <span class="comment">// handling</span></span><br><span class="line">        &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
 
 <blockquote>
-<p>配置:</p>
+<p>自定义错误类型</p>
 </blockquote>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 最好是一次性初始化</span></span><br><span class="line">rs.initiate(&#123;_id:<span class="string">&quot;cisdi&quot;</span>,members:[</span><br><span class="line">&#123;_id:0,host:<span class="string">&quot;x.x.x.x:28017&quot;</span>,priority:5&#125;,</span><br><span class="line">&#123;_id:1,host:<span class="string">&quot;x.x.x.x:28017&quot;</span>,priority:10&#125;,</span><br><span class="line">&#123;_id:2,host:<span class="string">&quot;x.x.x.x:28018&quot;</span>,arbiterOnly:<span class="literal">true</span>&#125;</span><br><span class="line">]&#125;)</span><br></pre></td></tr></table></figure>
-
-<p>或者用</p>
-<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 添加rs节点</span></span><br><span class="line">rs.add(<span class="string">&quot;xxxx:port&quot;</span>)</span><br><span class="line"><span class="comment"># 添加rs仲裁节点</span></span><br><span class="line">rs.addArb(<span class="string">&quot;xxxx:port&quot;</span>)</span><br><span class="line"><span class="comment"># 删除rs节点</span></span><br><span class="line">rs.remove(<span class="string">&quot;xxxx:port&quot;</span>)</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>创建用户:</p>
-</blockquote>
-<p><strong><code>Notice：</code></strong></p>
+<p>自定义结构体错误类型，通过传值的方式构造错误信息。至少实现<code>Error()</code>方法。</p>
+<figure class="highlight golang"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> HTTPError <span class="keyword">struct</span> &#123;</span><br><span class="line">    Code        <span class="type">int</span></span><br><span class="line">    Description <span class="type">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(h *HTTPError)</span></span> Error() <span class="type">string</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> fmt.Sprintf(<span class="string">&quot;status code %d: %s&quot;</span>, h.Code, h.Description)&#125;</span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">request</span><span class="params">()</span></span> <span class="type">error</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &amp;HTTPError&#123;<span class="number">404</span>, <span class="string">&quot;not found&quot;</span>&#125;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    err := request()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="comment">// an error occured</span></span><br><span class="line">        <span class="keyword">if</span> err.(*HTTPError).Code == <span class="number">404</span> &#123;</span><br><span class="line">            <span class="comment">// handle a &quot;not found&quot; error</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// handle a different error</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="2-panic-amp-recover-处理异常"><a href="#2-panic-amp-recover-处理异常" class="headerlink" title="2. panic &amp; recover 处理异常"></a>2. panic &amp; recover 处理异常</h2><p>panic / recover 机制控制流作用在整个 goroutine 的调用栈。</p>
 <ul>
-<li>你创建的第一个用户后，本地实例登陆失效，必须进行验证。</li>
-<li>第一个用户<strong>必须创建其他用户的权限</strong>，如<kbd><strong><code>userAdminAnyDatabase</code></strong></kbd>,<kbd><strong><code>root</code></strong></kbd>权限用户</li>
-<li>如果至少有一个用户没有创建用户的权限，一旦本地异常关闭你可能无法创建或修改新的特权用户</li>
+<li>当 goroutine 执行到 panic 时，控制流开始在当前 goroutine 的调用栈内向上回溯(unwind)并执行每个函数的 defer。</li>
+<li>如果 defer 中遇到 recover 则回溯停止</li>
+<li>如果执行到 goroutine 最顶层的 defer 还没有 recover ，运行时就输出调用栈信息然后退出。</li>
 </ul>
-<blockquote>
-<p>创建命令：</p>
-</blockquote>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">db.createUser(</span><br><span class="line">&#123;</span><br><span class="line">	user:&quot;root&quot;,</span><br><span class="line">	pwd:&quot;123456&quot;,</span><br><span class="line">	roles:[&#123;role:&quot;root&quot;,db:&quot;admin&quot;&#125;]</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>用户权限</p>
-</blockquote>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 全局超级管理员</span></span><br><span class="line">&#123;role:<span class="string">&quot;root&quot;</span>,db:<span class="string">&quot;admin&quot;</span>&#125;</span><br><span class="line"><span class="comment"># userAdminAnyDatabase 任何一个数据库的Admin用户</span></span><br><span class="line">&#123; role: <span class="string">&quot;userAdminAnyDatabase&quot;</span>, db: <span class="string">&quot;admin&quot;</span> &#125;</span><br><span class="line"><span class="comment"># clusterAdmin角色授予对复制操作的访问权限，例如配置副本集。</span></span><br><span class="line">&#123; <span class="string">&quot;role&quot;</span> : <span class="string">&quot;clusterAdmin&quot;</span>, <span class="string">&quot;db&quot;</span> : <span class="string">&quot;admin&quot;</span> &#125;</span><br></pre></td></tr></table></figure>
-
-<p>数据库 Role:</p>
-<ul>
-<li><strong>dbAdmin</strong></li>
-<li><strong>dbOwner</strong><br>数据库所有者可以对数据库执行任何管理操作。这个角色组合由授予的权限readWrite， dbAdmin和userAdmin角色</li>
-<li><strong>userAdmin</strong><br>提供在当前数据库上创建和修改角色和用户的功能。该角色还间接地提供 对数据库的超级用户访问，或者如果作用于admin数据库的集群。该userAdmin角色允许用户授予任何用户任何特权，包括自己。</li>
-<li><strong>read</strong><br>对当前数据库的读操作</li>
-<li><strong>readWrite</strong><br>对当前数据库的读&amp;写操作</li>
-</ul>
-<p>全局 Role：</p>
-<ul>
-<li>readAnyDatabase （全局任何数据库读）</li>
-<li>readWriteAnyDatabase</li>
-<li>userAdminAnyDatabase （全局用户管理）</li>
-<li>dbAdminAnyDatabase（全局数据库管理）</li>
-</ul>
-<p>集群 Role：</p>
-<ul>
-<li><strong>clusterAdmin</strong><br>提供最大的集群管理访问。这个角色组合由授予的权限clusterManager， clusterMonitor和hostManager角色</li>
-<li><strong>clusterManager</strong><br>在集群上提供管理和监控动作。具有该角色的用户可以访问config和local数据库，其在分片和复制所使用的</li>
-<li><strong>clusterMonitor</strong><br>提供对监控工具（如MongoDB Cloud Manager和Ops Manager监控代理）的只读访问 。</li>
-<li><strong>hostManager</strong><br>提供监控和管理服务器的能力。</li>
-</ul>
-<h3 id="设置从库可读"><a href="#设置从库可读" class="headerlink" title="设置从库可读"></a>设置从库可读</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">rs.slaveOk()</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>设置读写方式</p>
-</blockquote>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#Primary               #从主的读，默认</span></span><br><span class="line"><span class="comment">#primaryPreferred      #基本上从主的读，主不可用时，从从的读</span></span><br><span class="line"><span class="comment">#secondary             #从从的读</span></span><br><span class="line"><span class="comment">#secondaryPreferred    #基本上从从的读，从不可用时，从主的读</span></span><br><span class="line"><span class="comment">#nearest               #从网络延迟最小的读</span></span><br><span class="line">db.getMongo().setReadPref(<span class="string">&#x27;secondaryPreferred&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-<h3 id="关闭服务"><a href="#关闭服务" class="headerlink" title="关闭服务"></a>关闭服务</h3><blockquote>
-<p>使用db admin关闭</p>
-</blockquote>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. 登陆mongo</span></span><br><span class="line"><span class="comment"># 2. 使用admin</span></span><br><span class="line">use admin</span><br><span class="line"><span class="comment"># 3. 关闭mongodb服务</span></span><br><span class="line">db.shutdownServer();</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>通过mongod关闭</p>
-</blockquote>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">mongod --shutdown --dbpath path</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>通过PID关闭</p>
-</blockquote>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 找到mongodb.pid</span></span><br><span class="line"><span class="built_in">kill</span> -2 mongodb.pid</span><br></pre></td></tr></table></figure>
+<p>如果要使用 recover 避免 panic 导致进程挂掉，<code>recover 必须要放到 defer 里</code>。</p>
+<h3 id="使用场景-1"><a href="#使用场景-1" class="headerlink" title="使用场景"></a>使用场景</h3><ol>
+<li>发生严重错误(critical error)必须让进程退出。</li>
+</ol>
+<p>当错误无法恢复导致程序无法执行或继续执行会出现不可预知的行为时，可以用panic。例如：启动参数不符合预期等。</p>
+<ol start="2">
+<li>快速退出错误处理。</li>
+</ol>
+<p>类似于try-catch逻辑，使用panic让顶层的revocer来处理相关的错误。但是尽量在包内处理，避免复杂逻辑。</p>
+<h3 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h3><figure class="highlight golang"><table><tr><td class="code"><pre><span class="line"><span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> err2 := <span class="built_in">recover</span>(); err2 != <span class="literal">nil</span> &#123;</span><br><span class="line">        debug.PrintStack()</span><br><span class="line">        statusCode = http.StatusInternalServerError</span><br><span class="line">        err = fmt.Errorf(<span class="string">&quot;%v&quot;</span>,err2)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;()</span><br><span class="line"></span><br><span class="line">c := <span class="built_in">new</span>(dns.Client)</span><br><span class="line">c.Net = <span class="string">&quot;udp4&quot;</span></span><br><span class="line">r, rtt, err := c.Exchange(m, nameserver)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    logs.Error(err)</span><br><span class="line">    <span class="built_in">panic</span>(err)</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> !r.Response &#123;</span><br><span class="line">    err = errors.New(<span class="string">&quot;did not get any response&quot;</span>)</span><br><span class="line">    logs.Error(err)</span><br><span class="line">    <span class="built_in">panic</span>(err)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>MongoDB</category>
+        <category>Golang</category>
       </categories>
       <tags>
-        <tag>Linux</tag>
-        <tag>Ubuntu</tag>
-        <tag>MongoDB</tag>
+        <tag>Golang</tag>
       </tags>
   </entry>
   <entry>
@@ -506,158 +428,127 @@
       </tags>
   </entry>
   <entry>
-    <title>Golang错误与异常处理</title>
-    <url>/2020/05/17/Golang%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86/</url>
-    <content><![CDATA[<p>Golang错误类型使用error进行处理，而异常通常使用panic-recover进行处理。</p>
+    <title>Mongodb ReplicatSet 认证（KeyFile）</title>
+    <url>/2017/07/27/Mongodb-%E9%9B%86%E7%BE%A4%E8%AE%A4%E8%AF%81%EF%BC%88KeyFile%EF%BC%89/</url>
+    <content><![CDATA[<p>MongoDB 是由C++语言编写的，是一个基于分布式文件存储的开源数据库系统。在高负载的情况下，添加更多的节点，可以保证服务器性能。MongoDB的安全设置（<strong>特别是集群安全</strong>）一直是比较恼人的。那今天这篇文章就是来和大家聊聊使用Key File的ReplicatSet + User Role认证。</p>
 <span id="more"></span>
 
-<h2 id="1-使用error处理错误"><a href="#1-使用error处理错误" class="headerlink" title="1. 使用error处理错误"></a>1. 使用error处理错误</h2><p>error类型是一个接口类型，自定义的错误类型也必须实现为 error 接口，可以通过 Error() 获取到具体的错误信息而不用关心错误的具体类型。<br>它的定义：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> <span class="type">error</span> <span class="keyword">interface</span> &#123;</span><br><span class="line">    Error() <span class="type">string</span>&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="1-下载MongoDB并创建数据文件夹"><a href="#1-下载MongoDB并创建数据文件夹" class="headerlink" title="1. 下载MongoDB并创建数据文件夹"></a>1. 下载MongoDB并创建数据文件夹</h2><p>MongoDB的下载可以直接通过镜像源或者是去官网下载安装包的方式，这里就不再赘述了。默认大家都会下载和安装。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 配置文件夹</span></span><br><span class="line"><span class="built_in">mkdir</span> conf</span><br><span class="line"><span class="comment"># 日志文件夹</span></span><br><span class="line"><span class="built_in">mkdir</span> <span class="built_in">log</span></span><br><span class="line"><span class="comment"># 日志文件</span></span><br><span class="line"><span class="built_in">touch</span> <span class="built_in">log</span>/1.<span class="built_in">log</span></span><br><span class="line"><span class="comment"># 认证文件夹</span></span><br><span class="line"><span class="built_in">mkdir</span> key</span><br></pre></td></tr></table></figure>
 
-<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">testSqrt</span><span class="params">(f <span class="type">float64</span>)</span></span>(<span class="type">float64</span>, <span class="type">error</span>)&#123;    </span><br><span class="line">    <span class="keyword">if</span> f &lt; <span class="number">0</span> &#123;         </span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>, errors.New(<span class="string">&quot;请输入正数&quot;</span>)    </span><br><span class="line">    &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">        sqrt := math.Sqrt(f)         </span><br><span class="line">        <span class="keyword">return</span> sqrt,<span class="literal">nil</span>    </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>使用标准库的 <code>fmt.Errorf</code> 和 <code>errors.New</code> 可以方便的创建 error 类型的变量。</p>
-<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><blockquote>
-<p>预定义错误值</p>
+<h2 id="2-生成KeyFIle"><a href="#2-生成KeyFIle" class="headerlink" title="2. 生成KeyFIle"></a>2. 生成KeyFIle</h2><blockquote>
+<p>随机生成keyFile或者手动写入,key的长度必须是6-1024的base64字符，unix下必须相同组权限</p>
 </blockquote>
-<p>预定义全局的错误变量，方便在后续逻辑中进行对应的error判断。</p>
-<figure class="highlight golang"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">var</span> (</span><br><span class="line">    ErrInventoryInsufficient      = errors.New(<span class="string">&quot;product inventory insufficient&quot;</span>)</span><br><span class="line">    ErrProductSalesTerritoryLimit = errors.New(<span class="string">&quot;product sales torritory limit&quot;</span>)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">switch</span> err &#123;</span><br><span class="line">            <span class="keyword">case</span> service.ErrInventoryInsufficient:      <span class="comment">// handling</span></span><br><span class="line">            <span class="keyword">case</span> service.ErrProductSalesTerritoryLimit: <span class="comment">// handling</span></span><br><span class="line">        &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> key</span><br><span class="line">openssl rand -<span class="built_in">base64</span> 600 &gt; mongodb.key</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看内容</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">xV7Ilo4O3+GHb57LECdoQwJ2u5DrcUsgHhzfXRrvvRVsnDaGNpp3qOvlTm1p3PjC</span><br><span class="line">L8gkVAV2vG/L8yG+HdBYgbZ/cEW49tlj/CSuK7wd4g/E40jk3uJPb8nMyXsZk4W1</span><br><span class="line">6TAL/5Teq5mY4VqAnuY1JqfPwgIyOYMn9ZCs5Wv/htnYR2n14hiw4bXe2ADaiD42</span><br><span class="line">kn7QhbuXxQBHxx3Yb/KTlEBqAm0aOAAueSbDvDwcnrsxoEcMnWq9gAhxzNmh9nv7</span><br><span class="line">E3b7JqKn/jo+ZIrfAropvbz7JqcPIUp0yfDsrolIlvRn965Z/+3ZJMQgU/QrLNjY</span><br><span class="line">wNcj7SqMXoXikTCalLycIbSWymX9dCMjOJ259k/ieU3LlGtLvWmozFlsG/Yu50w+</span><br><span class="line">kQ3uIH1Rq8KH1Gg35dtjr8sbObD/W4KEelwdTm3WqJIRZVVu6CYkDjBeSpXPSnrx</span><br><span class="line">C+DnN4U7PEZ8O07MRDps/oXcK2dXv1FmaoeTnQ7BzLITc0FSAa8oT4llBN2rXzQn</span><br><span class="line">XXdlLoZ8H71Z0+OeD1/h9qGIYfB3bKWzeoPY2cd3b37lQe9a5UVPX+1GEyiut5kv</span><br><span class="line">LgF3dgJ99/VmSvzBCdgwiMOu0eNxBvedqFnchMtqth85WJRMIcS5p2Pa8z7Wkjav</span><br><span class="line">8wUdPDf4udv7b4x8cgEdv4kNB/PPtHTUTsP51Y0Zlds=</span><br></pre></td></tr></table></figure>
+<ul>
+<li>修改key的权限</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 这里的权限一定要比 600(rw) 低, 否则会报 Permission 太高的错误(在log中)</span></span><br><span class="line"><span class="built_in">chmod</span> 600 mongodb.key</span><br><span class="line"><span class="comment"># 查看权限</span></span><br><span class="line"><span class="built_in">ls</span> -l</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">-rw------- 1 root root 1085 Jul 26 16:03 mongodb.key</span><br></pre></td></tr></table></figure>
+<p><strong><code>将 keyFile 分发到每一个节点（如果是物理机）</code></strong></p>
+<h2 id="3-配置文件"><a href="#3-配置文件" class="headerlink" title="3. 配置文件"></a>3. 配置文件</h2><blockquote>
+<p>模板 mongod.conf</p>
+</blockquote>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># for documentation of all options, see:</span></span><br><span class="line"><span class="comment">#   http://docs.mongodb.org/manual/reference/configuration-options/</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Where and how to store data.</span></span><br><span class="line"><span class="attr">storage:</span></span><br><span class="line">  <span class="attr">dbPath:</span> <span class="string">/db/mongodb3/data</span></span><br><span class="line">  <span class="attr">journal:</span></span><br><span class="line">    <span class="attr">enabled:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">directoryPerDB:</span> <span class="literal">true</span></span><br><span class="line"><span class="comment">#  engine:</span></span><br><span class="line"><span class="comment">#  mmapv1:</span></span><br><span class="line"><span class="comment">#  wiredTiger:</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># where to write logging data.</span></span><br><span class="line"><span class="attr">systemLog:</span></span><br><span class="line">  <span class="attr">destination:</span> <span class="string">file</span></span><br><span class="line">  <span class="attr">logAppend:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">path:</span> <span class="string">/db/mongodb3/log/1.log</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># network interfaces</span></span><br><span class="line"><span class="attr">net:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">28017</span></span><br><span class="line"> <span class="comment"># bindIp: 127.0.0.1</span></span><br><span class="line"></span><br><span class="line"><span class="attr">processManagement:</span></span><br><span class="line">  <span class="attr">fork:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 指定keyFile后会自动开启auth</span></span><br><span class="line"><span class="attr">security:</span></span><br><span class="line">  <span class="attr">keyFile:</span> <span class="string">/db/mongodb3/key/key</span></span><br><span class="line"><span class="comment">#operationProfiling:</span></span><br><span class="line"></span><br><span class="line"><span class="attr">replication:</span></span><br><span class="line">  <span class="attr">replSetName:</span> <span class="string">DBTEST</span></span><br><span class="line">  <span class="attr">oplogSizeMB:</span> <span class="number">20480</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#sharding:</span></span><br><span class="line"><span class="comment">## Enterprise-Only Options:</span></span><br><span class="line"><span class="comment">#auditLog:</span></span><br><span class="line"><span class="comment">#snmp:</span></span><br></pre></td></tr></table></figure>
+
+<p><strong><code>注意:</code></strong></p>
+<ul>
+<li>所有的机器节点都要在防火墙上<strong>开启 mongodb 需要的端口</strong></li>
+<li>keyFile的路径, 以及各种参数的<strong><code>大小写</code></strong></li>
+<li>分片集或者复制集的<strong><code>每一个节点</code></strong>(物理或者虚拟)都要分开配置配置文件以及keyFile</li>
+</ul>
+<h2 id="3-启动"><a href="#3-启动" class="headerlink" title="3. 启动"></a>3. 启动</h2><p><strong><code>在每一个节点执行</code></strong></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 配置文件名自定（可以使用conf，yaml）</span></span><br><span class="line">mongod -f mongod.conf</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">about to fork child process, waiting until server is ready <span class="keyword">for</span> connections.</span><br><span class="line">forked process: 9221</span><br><span class="line">child process started successfully, parent exiting</span><br></pre></td></tr></table></figure>
+<h2 id="4-配置复制集"><a href="#4-配置复制集" class="headerlink" title="4. 配置复制集"></a>4. 配置复制集</h2><blockquote>
+<p>连接Mongo [<strong><code>任意一个节点</code></strong>]</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">mongo --port 28017</span><br></pre></td></tr></table></figure>
 
 <blockquote>
-<p>自定义错误类型</p>
+<p>配置:</p>
 </blockquote>
-<p>自定义结构体错误类型，通过传值的方式构造错误信息。至少实现<code>Error()</code>方法。</p>
-<figure class="highlight golang"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> HTTPError <span class="keyword">struct</span> &#123;</span><br><span class="line">    Code        <span class="type">int</span></span><br><span class="line">    Description <span class="type">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(h *HTTPError)</span></span> Error() <span class="type">string</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> fmt.Sprintf(<span class="string">&quot;status code %d: %s&quot;</span>, h.Code, h.Description)&#125;</span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">request</span><span class="params">()</span></span> <span class="type">error</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &amp;HTTPError&#123;<span class="number">404</span>, <span class="string">&quot;not found&quot;</span>&#125;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    err := request()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="comment">// an error occured</span></span><br><span class="line">        <span class="keyword">if</span> err.(*HTTPError).Code == <span class="number">404</span> &#123;</span><br><span class="line">            <span class="comment">// handle a &quot;not found&quot; error</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// handle a different error</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="2-panic-amp-recover-处理异常"><a href="#2-panic-amp-recover-处理异常" class="headerlink" title="2. panic &amp; recover 处理异常"></a>2. panic &amp; recover 处理异常</h2><p>panic / recover 机制控制流作用在整个 goroutine 的调用栈。</p>
-<ul>
-<li>当 goroutine 执行到 panic 时，控制流开始在当前 goroutine 的调用栈内向上回溯(unwind)并执行每个函数的 defer。</li>
-<li>如果 defer 中遇到 recover 则回溯停止</li>
-<li>如果执行到 goroutine 最顶层的 defer 还没有 recover ，运行时就输出调用栈信息然后退出。</li>
-</ul>
-<p>如果要使用 recover 避免 panic 导致进程挂掉，<code>recover 必须要放到 defer 里</code>。</p>
-<h3 id="使用场景-1"><a href="#使用场景-1" class="headerlink" title="使用场景"></a>使用场景</h3><ol>
-<li>发生严重错误(critical error)必须让进程退出。</li>
-</ol>
-<p>当错误无法恢复导致程序无法执行或继续执行会出现不可预知的行为时，可以用panic。例如：启动参数不符合预期等。</p>
-<ol start="2">
-<li>快速退出错误处理。</li>
-</ol>
-<p>类似于try-catch逻辑，使用panic让顶层的revocer来处理相关的错误。但是尽量在包内处理，避免复杂逻辑。</p>
-<h3 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h3><figure class="highlight golang"><table><tr><td class="code"><pre><span class="line"><span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> err2 := <span class="built_in">recover</span>(); err2 != <span class="literal">nil</span> &#123;</span><br><span class="line">        debug.PrintStack()</span><br><span class="line">        statusCode = http.StatusInternalServerError</span><br><span class="line">        err = fmt.Errorf(<span class="string">&quot;%v&quot;</span>,err2)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;()</span><br><span class="line"></span><br><span class="line">c := <span class="built_in">new</span>(dns.Client)</span><br><span class="line">c.Net = <span class="string">&quot;udp4&quot;</span></span><br><span class="line">r, rtt, err := c.Exchange(m, nameserver)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    logs.Error(err)</span><br><span class="line">    <span class="built_in">panic</span>(err)</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> !r.Response &#123;</span><br><span class="line">    err = errors.New(<span class="string">&quot;did not get any response&quot;</span>)</span><br><span class="line">    logs.Error(err)</span><br><span class="line">    <span class="built_in">panic</span>(err)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>Golang</category>
-      </categories>
-      <tags>
-        <tag>Golang</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Ubuntu 分区（目录）挂载/扩容</title>
-    <url>/2017/07/17/Ubuntu-%E5%88%86%E5%8C%BA%EF%BC%88%E7%9B%AE%E5%BD%95%EF%BC%89%E6%8C%82%E8%BD%BD-%E6%89%A9%E5%AE%B9/</url>
-    <content><![CDATA[<p>这次写的教程是经过我多次验证，用于对Ubuntu分区（目录）操作的一些经验。分享给大家，希望能够有所帮助。</p>
-<p><strong>友善提醒：硬盘操作有风险，请注意备份自己的重要资料。如果不熟练，请在虚拟机上自己多操作几次，再在Server上面操作</strong></p>
-<span id="more"></span>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 最好是一次性初始化</span></span><br><span class="line">rs.initiate(&#123;_id:<span class="string">&quot;cisdi&quot;</span>,members:[</span><br><span class="line">&#123;_id:0,host:<span class="string">&quot;x.x.x.x:28017&quot;</span>,priority:5&#125;,</span><br><span class="line">&#123;_id:1,host:<span class="string">&quot;x.x.x.x:28017&quot;</span>,priority:10&#125;,</span><br><span class="line">&#123;_id:2,host:<span class="string">&quot;x.x.x.x:28018&quot;</span>,arbiterOnly:<span class="literal">true</span>&#125;</span><br><span class="line">]&#125;)</span><br></pre></td></tr></table></figure>
 
-<h2 id="1-为啥会被分区容量所困扰？"><a href="#1-为啥会被分区容量所困扰？" class="headerlink" title="1.为啥会被分区容量所困扰？"></a>1.为啥会被分区容量所困扰？</h2><p>通常情况下，我们在使用Ubuntu还是没啥大毛病。可是有一天，突然在解开锁屏的时候，突然弹出如下警告。。。</p>
-<p><img src="https://pic3.zhimg.com/v2-88408a07f66d85e07a333c6e22c881ea_b.png" alt="磁盘空间不足提示"></p>
-<p>系统磁盘容量不足！！！这个时候就有点烦心了。左思右想，有如下几种应急方法（欢迎添加）</p>
-<ul>
-<li>先去删一波 /tmp, /var/cache/apt/archives下面的临时文件， 删掉不用的软件和遗留的目录、日志</li>
-<li>autoremove, autoclean 删掉多余的 lib</li>
-<li>删掉/home下面多余的文档</li>
-<li>添加新的硬盘<br>前三种方法都是暂时性的应急，不是长久之计。而且，当你的硬盘里面存了大量的重要的资料的时候（譬如用户的数据，重要的数据文件等），这个时候就不得不采用第四种方案了。</li>
-</ul>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><blockquote>
-<p>将新的硬盘挂载到需要添加存储介质的目录下（根据实际需要）</p>
+<p>或者用</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 添加rs节点</span></span><br><span class="line">rs.add(<span class="string">&quot;xxxx:port&quot;</span>)</span><br><span class="line"><span class="comment"># 添加rs仲裁节点</span></span><br><span class="line">rs.addArb(<span class="string">&quot;xxxx:port&quot;</span>)</span><br><span class="line"><span class="comment"># 删除rs节点</span></span><br><span class="line">rs.remove(<span class="string">&quot;xxxx:port&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>创建用户:</p>
 </blockquote>
-<h2 id="1-查看磁盘信息"><a href="#1-查看磁盘信息" class="headerlink" title="1. 查看磁盘信息"></a>1. 查看磁盘信息</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo fdisk -l</span><br></pre></td></tr></table></figure>
-<p><img src="/2017/07/17/Ubuntu-%E5%88%86%E5%8C%BA%EF%BC%88%E7%9B%AE%E5%BD%95%EF%BC%89%E6%8C%82%E8%BD%BD-%E6%89%A9%E5%AE%B9/1.png" alt="磁盘信息"></p>
-<p>作为测试，我选取 /dev/sda5, 想要将其挂载到 /home/nutao/disk/D 下面</p>
-<p>查看硬盘使用情况用如下命令：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">df</span> -kh</span><br></pre></td></tr></table></figure>
-<h2 id="2-查看硬盘-UUID-和-磁盘类型"><a href="#2-查看硬盘-UUID-和-磁盘类型" class="headerlink" title="2. 查看硬盘 UUID 和 磁盘类型"></a>2. 查看硬盘 UUID 和 磁盘类型</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo blkid</span><br></pre></td></tr></table></figure>
-<p><img src="/2017/07/17/Ubuntu-%E5%88%86%E5%8C%BA%EF%BC%88%E7%9B%AE%E5%BD%95%EF%BC%89%E6%8C%82%E8%BD%BD-%E6%89%A9%E5%AE%B9/2.png" alt="UUID"></p>
-<p>用记事本或者其他工具记录下 /dev/sda5 的UUID和分区格式（建议将新的硬盘分区为ext4）</p>
-<h2 id="3-取消挂载目标盘"><a href="#3-取消挂载目标盘" class="headerlink" title="3. 取消挂载目标盘"></a>3. 取消挂载目标盘</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo umount /dev/sda5</span><br></pre></td></tr></table></figure>
-<h2 id="4-编辑-etc-fstab-文件"><a href="#4-编辑-etc-fstab-文件" class="headerlink" title="4. 编辑 /etc/fstab 文件"></a>4. 编辑 /etc/fstab 文件</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo vi /etc/fstab</span><br></pre></td></tr></table></figure>
-<p>追加一行内容</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">UUID=0008DCD1000EA709 /home/nutao/disk/D    ntfs    defaults    0   2</span><br></pre></td></tr></table></figure>
-<p>其中第一列为UUID, 第二列为挂载目录（该目录必须为空目录），第三列为文件系统类型，第四列为参数，第五列0表示不备份，最后一列必须为２或0(除非引导分区为1)</p>
-<h2 id="5-更新引导（千万记得更新，否则重启会出错）"><a href="#5-更新引导（千万记得更新，否则重启会出错）" class="headerlink" title="5. 更新引导（千万记得更新，否则重启会出错）"></a>5. 更新引导（千万记得更新，否则重启会出错）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo update-grub</span><br><span class="line">sudo update-grub2</span><br></pre></td></tr></table></figure>
-<hr>
-<h2 id="Linux下分区工具-gparted"><a href="#Linux下分区工具-gparted" class="headerlink" title="Linux下分区工具 gparted"></a>Linux下分区工具 gparted</h2><p>安装命令</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Debian</span></span><br><span class="line">sudo apt-get install gparted</span><br><span class="line"></span><br><span class="line"><span class="comment"># Fedora</span></span><br><span class="line">su -c <span class="string">&quot;yum install gparted&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># OpenSUSE</span></span><br><span class="line">sudo zypper install gparted</span><br><span class="line"></span><br><span class="line"><span class="comment"># Ubuntu</span></span><br><span class="line">sudo apt-get install gparted</span><br></pre></td></tr></table></figure>
+<p><strong><code>Notice：</code></strong></p>
+<ul>
+<li>你创建的第一个用户后，本地实例登陆失效，必须进行验证。</li>
+<li>第一个用户<strong>必须创建其他用户的权限</strong>，如<kbd><strong><code>userAdminAnyDatabase</code></strong></kbd>,<kbd><strong><code>root</code></strong></kbd>权限用户</li>
+<li>如果至少有一个用户没有创建用户的权限，一旦本地异常关闭你可能无法创建或修改新的特权用户</li>
+</ul>
+<blockquote>
+<p>创建命令：</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">db.createUser(</span><br><span class="line">&#123;</span><br><span class="line">	user:&quot;root&quot;,</span><br><span class="line">	pwd:&quot;123456&quot;,</span><br><span class="line">	roles:[&#123;role:&quot;root&quot;,db:&quot;admin&quot;&#125;]</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>用户权限</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 全局超级管理员</span></span><br><span class="line">&#123;role:<span class="string">&quot;root&quot;</span>,db:<span class="string">&quot;admin&quot;</span>&#125;</span><br><span class="line"><span class="comment"># userAdminAnyDatabase 任何一个数据库的Admin用户</span></span><br><span class="line">&#123; role: <span class="string">&quot;userAdminAnyDatabase&quot;</span>, db: <span class="string">&quot;admin&quot;</span> &#125;</span><br><span class="line"><span class="comment"># clusterAdmin角色授予对复制操作的访问权限，例如配置副本集。</span></span><br><span class="line">&#123; <span class="string">&quot;role&quot;</span> : <span class="string">&quot;clusterAdmin&quot;</span>, <span class="string">&quot;db&quot;</span> : <span class="string">&quot;admin&quot;</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>数据库 Role:</p>
+<ul>
+<li><strong>dbAdmin</strong></li>
+<li><strong>dbOwner</strong><br>数据库所有者可以对数据库执行任何管理操作。这个角色组合由授予的权限readWrite， dbAdmin和userAdmin角色</li>
+<li><strong>userAdmin</strong><br>提供在当前数据库上创建和修改角色和用户的功能。该角色还间接地提供 对数据库的超级用户访问，或者如果作用于admin数据库的集群。该userAdmin角色允许用户授予任何用户任何特权，包括自己。</li>
+<li><strong>read</strong><br>对当前数据库的读操作</li>
+<li><strong>readWrite</strong><br>对当前数据库的读&amp;写操作</li>
+</ul>
+<p>全局 Role：</p>
+<ul>
+<li>readAnyDatabase （全局任何数据库读）</li>
+<li>readWriteAnyDatabase</li>
+<li>userAdminAnyDatabase （全局用户管理）</li>
+<li>dbAdminAnyDatabase（全局数据库管理）</li>
+</ul>
+<p>集群 Role：</p>
+<ul>
+<li><strong>clusterAdmin</strong><br>提供最大的集群管理访问。这个角色组合由授予的权限clusterManager， clusterMonitor和hostManager角色</li>
+<li><strong>clusterManager</strong><br>在集群上提供管理和监控动作。具有该角色的用户可以访问config和local数据库，其在分片和复制所使用的</li>
+<li><strong>clusterMonitor</strong><br>提供对监控工具（如MongoDB Cloud Manager和Ops Manager监控代理）的只读访问 。</li>
+<li><strong>hostManager</strong><br>提供监控和管理服务器的能力。</li>
+</ul>
+<h3 id="设置从库可读"><a href="#设置从库可读" class="headerlink" title="设置从库可读"></a>设置从库可读</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">rs.slaveOk()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>设置读写方式</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#Primary               #从主的读，默认</span></span><br><span class="line"><span class="comment">#primaryPreferred      #基本上从主的读，主不可用时，从从的读</span></span><br><span class="line"><span class="comment">#secondary             #从从的读</span></span><br><span class="line"><span class="comment">#secondaryPreferred    #基本上从从的读，从不可用时，从主的读</span></span><br><span class="line"><span class="comment">#nearest               #从网络延迟最小的读</span></span><br><span class="line">db.getMongo().setReadPref(<span class="string">&#x27;secondaryPreferred&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="关闭服务"><a href="#关闭服务" class="headerlink" title="关闭服务"></a>关闭服务</h3><blockquote>
+<p>使用db admin关闭</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. 登陆mongo</span></span><br><span class="line"><span class="comment"># 2. 使用admin</span></span><br><span class="line">use admin</span><br><span class="line"><span class="comment"># 3. 关闭mongodb服务</span></span><br><span class="line">db.shutdownServer();</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>通过mongod关闭</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">mongod --shutdown --dbpath path</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>通过PID关闭</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 找到mongodb.pid</span></span><br><span class="line"><span class="built_in">kill</span> -2 mongodb.pid</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>Ubuntu</category>
+        <category>MongoDB</category>
       </categories>
       <tags>
         <tag>Linux</tag>
         <tag>Ubuntu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Ubuntu 换源，安装&amp;卸载软件</title>
-    <url>/2017/07/17/Ubuntu-%E6%8D%A2%E6%BA%90%EF%BC%8C%E5%AE%89%E8%A3%85-%E5%8D%B8%E8%BD%BD%E8%BD%AF%E4%BB%B6/</url>
-    <content><![CDATA[<p>国内的筒子们，经常发现在update的时候各种卡。。。有时候心情好，等等也就罢了。万一某一天急着安装软件，那种状态下，真的是多等一秒感觉都是心烦气躁的。所以，本文就来跟大家聊聊在Ubuntu 中换源，安装&amp;卸载软件的那些事，欢迎各位一起交流。。。<br><img src="/images/ubuntu16.04.png" alt="Ubuntu16.04"></p>
-<span id="more"></span>
-<h2 id="1-查找国内的开源镜像提供的源地址"><a href="#1-查找国内的开源镜像提供的源地址" class="headerlink" title="1. 查找国内的开源镜像提供的源地址"></a>1. 查找国内的开源镜像提供的源地址</h2><blockquote>
-<p>Ubuntu的源的list文件位于 <code>/etc/apt/sources.list</code></p>
-</blockquote>
-<ul>
-<li>高校镜像源（国内其他大学也有提供，可自行查找）<br><a href="http://link.zhihu.com/?target=https%3A//mirrors.tuna.tsinghua.edu.cn/help/ubuntu/" title="清华大学开源镜像站">清华大学开源镜像站 </a><br><a href="http://link.zhihu.com/?target=https%3A//mirrors.ustc.edu.cn/repogen/" title="中科大开源镜像站">中科大开源镜像站</a></li>
-</ul>
-<ul>
-<li>企业镜像源（其他企业的请自行查找）<br><a href="http://link.zhihu.com/?target=http%3A//mirrors.aliyun.com/help/ubuntu" title="阿里云开源镜像站">阿里云开源镜像站 </a><br><a href="http://link.zhihu.com/?target=http%3A//mirrors.163.com/.help/ubuntu.html" title="网易开源镜像站">网易开源镜像站</a></li>
-</ul>
-<p><strong>这里以清华源为例</strong></p>
-<p>先去查一下清华源的帮助文档，戳 <a href="http://link.zhihu.com/?target=https%3A//mirrors.tuna.tsinghua.edu.cn/help/ubuntu/" title="清华大学开源镜像站">清华大学开源镜像站 </a>，选择相匹配的Ubuntu的版本，会得到软件源镜像的地址。</p>
-<p>接下来直接替换一下系统的source.list文件<del>~</del></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 备份一下</span></span><br><span class="line">sudo <span class="built_in">cp</span> /etc/apt/sources.list /etc/apt/sources.list.bak</span><br><span class="line"><span class="comment"># 修改</span></span><br><span class="line">sudo vi /etc/apt/sources.list</span><br></pre></td></tr></table></figure>
-<p>将文档里面所有的内容删除，然后替换为清华镜像提供的软件源镜像的地址。<br>例如我用的 16.04 版， 替换为：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted universe multiverse</span></span><br></pre></td></tr></table></figure>
-<p>然后再update一下，你会发现速度还是有明显的提升的。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt update</span><br></pre></td></tr></table></figure>
-<h2 id="2-使用apt安装软件"><a href="#2-使用apt安装软件" class="headerlink" title="2. 使用apt安装软件"></a>2. 使用apt安装软件</h2><p>这个就不多说了，比较简单，譬如安装tree</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt install tree -y</span><br></pre></td></tr></table></figure>
-<p>这里的 -y 参数是为了在安装的时候默认选择yes</p>
-<h2 id="3-deb包安装-amp-卸载（需要先下载好）"><a href="#3-deb包安装-amp-卸载（需要先下载好）" class="headerlink" title="3. deb包安装&amp;卸载（需要先下载好）"></a>3. deb包安装&amp;卸载（需要先下载好）</h2><ul>
-<li>安装命令<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo dpkg -i xxx.deb</span><br></pre></td></tr></table></figure></li>
-<li>安装依赖（如果提示需要的话）<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get install -f</span><br></pre></td></tr></table></figure></li>
-<li>自动清除残留配置文件<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get autoclean</span><br><span class="line">sudo apt-get autoremove</span><br></pre></td></tr></table></figure></li>
-<li>完全卸载<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get remove --purge name</span><br></pre></td></tr></table></figure>
-一般来说，这样的卸载会比较干净地卸载掉软件。有些没有办法自动删除的文件，可以手动去删除掉</li>
-</ul>
-<h2 id="4-另一种deb包安装方式"><a href="#4-另一种deb包安装方式" class="headerlink" title="4. 另一种deb包安装方式"></a>4. 另一种deb包安装方式</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># cd到安装包目录</span></span><br><span class="line">sudo apt install ./xxxx.deb</span><br></pre></td></tr></table></figure>
-<h2 id="5-安装filename-tar-gz软件"><a href="#5-安装filename-tar-gz软件" class="headerlink" title="5. 安装filename.tar.gz软件"></a>5. 安装filename.tar.gz软件</h2><ul>
-<li>解压</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tar -xzvf file.tar.gz</span><br></pre></td></tr></table></figure>
-<ul>
-<li>然后在解压目录或者bin文件夹中执行setup.sh文件。。。这个一般不定，安装前最好查一下官网说明</li>
-</ul>
-<h2 id="6-源码安装"><a href="#6-源码安装" class="headerlink" title="6. 源码安装"></a>6. 源码安装</h2><p>有些软件没有被收录进软件镜像源，或者说开发者需要去使用他们最新的版本，这时候就要自己去他们的官网或者是代码托管平台下载最新的Linux源码，自己来build。</p>
-<p>这种方式安装需<strong>要解决很多的依赖</strong>。。。。安装前，多问问度娘，Google</p>
-<p>此处还是以tree为例：</p>
-<ul>
-<li>先去 <a href="http://link.zhihu.com/?target=ftp%3A//mama.indstate.edu/linux/tree/" title="Tree FTP">Tree FTP</a> 下载最新的源码包</li>
-<li>解压</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tar zxf tree-1.7.0.tgz</span><br><span class="line"><span class="built_in">cd</span>  tree-1.7.0/</span><br><span class="line">make and install</span><br><span class="line">sudo make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
-<p><strong>如果没有配置g++环境，先用apt安装build-essential</strong></p>
-<ul>
-<li>OK, 大功告成<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nutao@master:~/Public/tree-1.7.0$ tree</span><br><span class="line">.</span><br><span class="line">├── CHANGES</span><br><span class="line">├── color.c</span><br><span class="line">├── color.o</span><br><span class="line">├── doc</span><br><span class="line">│   ├── tree.1</span><br><span class="line">│   ├── tree.1.fr</span><br><span class="line">│   └── xml.dtd</span><br><span class="line">├── hash.c</span><br><span class="line">├── hash.o</span><br><span class="line">├── html.c</span><br><span class="line">├── html.o</span><br><span class="line">├── INSTALL</span><br><span class="line">├── json.c</span><br><span class="line">├── json.o</span><br><span class="line">├── LICENSE</span><br><span class="line">├── Makefile</span><br><span class="line">├── README</span><br><span class="line">├── strverscmp.c</span><br><span class="line">├── TODO</span><br><span class="line">├── tree</span><br><span class="line">├── tree.c</span><br><span class="line">├── tree.h</span><br><span class="line">├── tree.o</span><br><span class="line">├── unix.c</span><br><span class="line">├── unix.o</span><br><span class="line">├── xml.c</span><br><span class="line">└── xml.o</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h2 id="常用压缩文件的解压命令"><a href="#常用压缩文件的解压命令" class="headerlink" title="常用压缩文件的解压命令"></a>常用压缩文件的解压命令</h2><p>1、<em>.tar 用 tar –xvf 解压<br>2、</em>.gz 用 gzip -d或者gunzip 解压<br>3、.tar.gz和.tgz 用 tar –xzf 解压<br>4、<em>.bz2 用 bzip2 -d或者用bunzip2 解压<br>5、</em>.tar.bz2用tar –xjf 解压<br>6、<em>.Z 用 uncompress 解压<br>7、</em>.tar.Z 用tar –xZf 解压<br>8、<em>.rar 用 unrar e解压<br>9、</em>.zip 用 unzip 解压</p>
-]]></content>
-      <categories>
-        <category>Ubuntu</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>Ubuntu</tag>
+        <tag>MongoDB</tag>
       </tags>
   </entry>
   <entry>
@@ -825,42 +716,106 @@
       </tags>
   </entry>
   <entry>
-    <title>Ubuntu16.04 Grub Rescue</title>
-    <url>/2017/07/13/Ubuntu16-04-Grub-Rescue/</url>
-    <content><![CDATA[<p>如果某一天, 你不小心扩展了一下你的 / 目录, 又忘记了更新 grub 引导. 不好意思, 你有麻烦了</p>
-<p><img src="/images/1.png" alt="grub"></p>
-<h3 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h3><!-- more  -->
-<h4 id="1-ls-一下所有的盘符"><a href="#1-ls-一下所有的盘符" class="headerlink" title="1. ls 一下所有的盘符"></a>1. ls 一下所有的盘符</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">grub rescue&gt; ls</span><br></pre></td></tr></table></figure>
-<h4 id="2-找-boot-grub的分区"><a href="#2-找-boot-grub的分区" class="headerlink" title="2. 找/boot/grub的分区"></a>2. 找/boot/grub的分区</h4><blockquote>
-<p>如果你的 /boot 没有单独分区, 请执行</p>
+    <title>Ubuntu 换源，安装&amp;卸载软件</title>
+    <url>/2017/07/17/Ubuntu-%E6%8D%A2%E6%BA%90%EF%BC%8C%E5%AE%89%E8%A3%85-%E5%8D%B8%E8%BD%BD%E8%BD%AF%E4%BB%B6/</url>
+    <content><![CDATA[<p>国内的筒子们，经常发现在update的时候各种卡。。。有时候心情好，等等也就罢了。万一某一天急着安装软件，那种状态下，真的是多等一秒感觉都是心烦气躁的。所以，本文就来跟大家聊聊在Ubuntu 中换源，安装&amp;卸载软件的那些事，欢迎各位一起交流。。。<br><img src="/images/ubuntu16.04.png" alt="Ubuntu16.04"></p>
+<span id="more"></span>
+<h2 id="1-查找国内的开源镜像提供的源地址"><a href="#1-查找国内的开源镜像提供的源地址" class="headerlink" title="1. 查找国内的开源镜像提供的源地址"></a>1. 查找国内的开源镜像提供的源地址</h2><blockquote>
+<p>Ubuntu的源的list文件位于 <code>/etc/apt/sources.list</code></p>
 </blockquote>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">grub rescue&gt; ls (hd0,msdosx)/boot/grub</span><br></pre></td></tr></table></figure>
+<ul>
+<li>高校镜像源（国内其他大学也有提供，可自行查找）<br><a href="http://link.zhihu.com/?target=https%3A//mirrors.tuna.tsinghua.edu.cn/help/ubuntu/" title="清华大学开源镜像站">清华大学开源镜像站 </a><br><a href="http://link.zhihu.com/?target=https%3A//mirrors.ustc.edu.cn/repogen/" title="中科大开源镜像站">中科大开源镜像站</a></li>
+</ul>
+<ul>
+<li>企业镜像源（其他企业的请自行查找）<br><a href="http://link.zhihu.com/?target=http%3A//mirrors.aliyun.com/help/ubuntu" title="阿里云开源镜像站">阿里云开源镜像站 </a><br><a href="http://link.zhihu.com/?target=http%3A//mirrors.163.com/.help/ubuntu.html" title="网易开源镜像站">网易开源镜像站</a></li>
+</ul>
+<p><strong>这里以清华源为例</strong></p>
+<p>先去查一下清华源的帮助文档，戳 <a href="http://link.zhihu.com/?target=https%3A//mirrors.tuna.tsinghua.edu.cn/help/ubuntu/" title="清华大学开源镜像站">清华大学开源镜像站 </a>，选择相匹配的Ubuntu的版本，会得到软件源镜像的地址。</p>
+<p>接下来直接替换一下系统的source.list文件<del>~</del></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 备份一下</span></span><br><span class="line">sudo <span class="built_in">cp</span> /etc/apt/sources.list /etc/apt/sources.list.bak</span><br><span class="line"><span class="comment"># 修改</span></span><br><span class="line">sudo vi /etc/apt/sources.list</span><br></pre></td></tr></table></figure>
+<p>将文档里面所有的内容删除，然后替换为清华镜像提供的软件源镜像的地址。<br>例如我用的 16.04 版， 替换为：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted universe multiverse</span></span><br></pre></td></tr></table></figure>
+<p>然后再update一下，你会发现速度还是有明显的提升的。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt update</span><br></pre></td></tr></table></figure>
+<h2 id="2-使用apt安装软件"><a href="#2-使用apt安装软件" class="headerlink" title="2. 使用apt安装软件"></a>2. 使用apt安装软件</h2><p>这个就不多说了，比较简单，譬如安装tree</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt install tree -y</span><br></pre></td></tr></table></figure>
+<p>这里的 -y 参数是为了在安装的时候默认选择yes</p>
+<h2 id="3-deb包安装-amp-卸载（需要先下载好）"><a href="#3-deb包安装-amp-卸载（需要先下载好）" class="headerlink" title="3. deb包安装&amp;卸载（需要先下载好）"></a>3. deb包安装&amp;卸载（需要先下载好）</h2><ul>
+<li>安装命令<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo dpkg -i xxx.deb</span><br></pre></td></tr></table></figure></li>
+<li>安装依赖（如果提示需要的话）<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get install -f</span><br></pre></td></tr></table></figure></li>
+<li>自动清除残留配置文件<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get autoclean</span><br><span class="line">sudo apt-get autoremove</span><br></pre></td></tr></table></figure></li>
+<li>完全卸载<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get remove --purge name</span><br></pre></td></tr></table></figure>
+一般来说，这样的卸载会比较干净地卸载掉软件。有些没有办法自动删除的文件，可以手动去删除掉</li>
+</ul>
+<h2 id="4-另一种deb包安装方式"><a href="#4-另一种deb包安装方式" class="headerlink" title="4. 另一种deb包安装方式"></a>4. 另一种deb包安装方式</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># cd到安装包目录</span></span><br><span class="line">sudo apt install ./xxxx.deb</span><br></pre></td></tr></table></figure>
+<h2 id="5-安装filename-tar-gz软件"><a href="#5-安装filename-tar-gz软件" class="headerlink" title="5. 安装filename.tar.gz软件"></a>5. 安装filename.tar.gz软件</h2><ul>
+<li>解压</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tar -xzvf file.tar.gz</span><br></pre></td></tr></table></figure>
+<ul>
+<li>然后在解压目录或者bin文件夹中执行setup.sh文件。。。这个一般不定，安装前最好查一下官网说明</li>
+</ul>
+<h2 id="6-源码安装"><a href="#6-源码安装" class="headerlink" title="6. 源码安装"></a>6. 源码安装</h2><p>有些软件没有被收录进软件镜像源，或者说开发者需要去使用他们最新的版本，这时候就要自己去他们的官网或者是代码托管平台下载最新的Linux源码，自己来build。</p>
+<p>这种方式安装需<strong>要解决很多的依赖</strong>。。。。安装前，多问问度娘，Google</p>
+<p>此处还是以tree为例：</p>
+<ul>
+<li>先去 <a href="http://link.zhihu.com/?target=ftp%3A//mama.indstate.edu/linux/tree/" title="Tree FTP">Tree FTP</a> 下载最新的源码包</li>
+<li>解压</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tar zxf tree-1.7.0.tgz</span><br><span class="line"><span class="built_in">cd</span>  tree-1.7.0/</span><br><span class="line">make and install</span><br><span class="line">sudo make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
+<p><strong>如果没有配置g++环境，先用apt安装build-essential</strong></p>
+<ul>
+<li>OK, 大功告成<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nutao@master:~/Public/tree-1.7.0$ tree</span><br><span class="line">.</span><br><span class="line">├── CHANGES</span><br><span class="line">├── color.c</span><br><span class="line">├── color.o</span><br><span class="line">├── doc</span><br><span class="line">│   ├── tree.1</span><br><span class="line">│   ├── tree.1.fr</span><br><span class="line">│   └── xml.dtd</span><br><span class="line">├── hash.c</span><br><span class="line">├── hash.o</span><br><span class="line">├── html.c</span><br><span class="line">├── html.o</span><br><span class="line">├── INSTALL</span><br><span class="line">├── json.c</span><br><span class="line">├── json.o</span><br><span class="line">├── LICENSE</span><br><span class="line">├── Makefile</span><br><span class="line">├── README</span><br><span class="line">├── strverscmp.c</span><br><span class="line">├── TODO</span><br><span class="line">├── tree</span><br><span class="line">├── tree.c</span><br><span class="line">├── tree.h</span><br><span class="line">├── tree.o</span><br><span class="line">├── unix.c</span><br><span class="line">├── unix.o</span><br><span class="line">├── xml.c</span><br><span class="line">└── xml.o</span><br></pre></td></tr></table></figure>
 
-<blockquote>
-<p>如果你的 /boot 单独分区啦, 请执行</p>
+</li>
+</ul>
+<h2 id="常用压缩文件的解压命令"><a href="#常用压缩文件的解压命令" class="headerlink" title="常用压缩文件的解压命令"></a>常用压缩文件的解压命令</h2><p>1、<em>.tar 用 tar –xvf 解压<br>2、</em>.gz 用 gzip -d或者gunzip 解压<br>3、.tar.gz和.tgz 用 tar –xzf 解压<br>4、<em>.bz2 用 bzip2 -d或者用bunzip2 解压<br>5、</em>.tar.bz2用tar –xjf 解压<br>6、<em>.Z 用 uncompress 解压<br>7、</em>.tar.Z 用tar –xZf 解压<br>8、<em>.rar 用 unrar e解压<br>9、</em>.zip 用 unzip 解压</p>
+]]></content>
+      <categories>
+        <category>Ubuntu</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Ubuntu 分区（目录）挂载/扩容</title>
+    <url>/2017/07/17/Ubuntu-%E5%88%86%E5%8C%BA%EF%BC%88%E7%9B%AE%E5%BD%95%EF%BC%89%E6%8C%82%E8%BD%BD-%E6%89%A9%E5%AE%B9/</url>
+    <content><![CDATA[<p>这次写的教程是经过我多次验证，用于对Ubuntu分区（目录）操作的一些经验。分享给大家，希望能够有所帮助。</p>
+<p><strong>友善提醒：硬盘操作有风险，请注意备份自己的重要资料。如果不熟练，请在虚拟机上自己多操作几次，再在Server上面操作</strong></p>
+<span id="more"></span>
+
+<h2 id="1-为啥会被分区容量所困扰？"><a href="#1-为啥会被分区容量所困扰？" class="headerlink" title="1.为啥会被分区容量所困扰？"></a>1.为啥会被分区容量所困扰？</h2><p>通常情况下，我们在使用Ubuntu还是没啥大毛病。可是有一天，突然在解开锁屏的时候，突然弹出如下警告。。。</p>
+<p><img src="https://pic3.zhimg.com/v2-88408a07f66d85e07a333c6e22c881ea_b.png" alt="磁盘空间不足提示"></p>
+<p>系统磁盘容量不足！！！这个时候就有点烦心了。左思右想，有如下几种应急方法（欢迎添加）</p>
+<ul>
+<li>先去删一波 /tmp, /var/cache/apt/archives下面的临时文件， 删掉不用的软件和遗留的目录、日志</li>
+<li>autoremove, autoclean 删掉多余的 lib</li>
+<li>删掉/home下面多余的文档</li>
+<li>添加新的硬盘<br>前三种方法都是暂时性的应急，不是长久之计。而且，当你的硬盘里面存了大量的重要的资料的时候（譬如用户的数据，重要的数据文件等），这个时候就不得不采用第四种方案了。</li>
+</ul>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><blockquote>
+<p>将新的硬盘挂载到需要添加存储介质的目录下（根据实际需要）</p>
 </blockquote>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">grub rescue&gt; ls (hd0,msdosx)/grub</span><br></pre></td></tr></table></figure>
-
-<p>ls出如下的目录, 恭喜你找到 /boot 路径了</p>
-<h4 id="3-修复grub引导"><a href="#3-修复grub引导" class="headerlink" title="3. 修复grub引导"></a>3. 修复grub引导</h4><blockquote>
-<p>假设/boot 在(hd0,msdos3) 中</p>
-</blockquote>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># /boot 单独分区</span><br><span class="line">set root=(hd0,msdos3)</span><br><span class="line">set prefix=(hd0,msdos3)/grub</span><br><span class="line">insmod normal</span><br><span class="line">normal</span><br></pre></td></tr></table></figure>
-
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># /boot 没有单独分区</span><br><span class="line">set root=(hd0,msdos3)</span><br><span class="line">set prefix=(hd0,msdos3)/boot/grub</span><br><span class="line">insmod normal</span><br><span class="line">normal</span><br></pre></td></tr></table></figure>
-<p>正常情况下, 执行完后, 电脑就能开机进入桌面啦<br>然后, 还没有结束. (这时千万不要关机, 否则前面步骤再来一次)<br><strong>在正常进入系统以后…</strong></p>
-<h4 id="4-更新系统-grub-引导"><a href="#4-更新系统-grub-引导" class="headerlink" title="4. 更新系统 grub 引导"></a>4. 更新系统 grub 引导</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo update-grub</span><br><span class="line">sudo update-grub2</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>打印出如下日志(我是双系统)</p>
-</blockquote>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Generating grub configuration file ...</span><br><span class="line">Found linux image: /boot/vmlinuz-4.4.0-66-generic</span><br><span class="line">Found initrd image: /boot/initrd.img-4.4.0-66-generic</span><br><span class="line">Found memtest86+ image: /memtest86+.elf</span><br><span class="line">Found memtest86+ image: /memtest86+.bin</span><br><span class="line">Found Windows 10 (loader) on /dev/sda1</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>然后重新安装grub</p>
-</blockquote>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">nutao@nutao-HP:~$ sudo grub-install /dev/sda</span><br><span class="line"># 日志</span><br><span class="line">Installing for i386-pc platform.</span><br><span class="line">Installation finished. No error reported.</span><br></pre></td></tr></table></figure>
-
-<h4 id="OK-一切搞定"><a href="#OK-一切搞定" class="headerlink" title="OK, 一切搞定"></a>OK, 一切搞定</h4>]]></content>
+<h2 id="1-查看磁盘信息"><a href="#1-查看磁盘信息" class="headerlink" title="1. 查看磁盘信息"></a>1. 查看磁盘信息</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo fdisk -l</span><br></pre></td></tr></table></figure>
+<p><img src="/2017/07/17/Ubuntu-%E5%88%86%E5%8C%BA%EF%BC%88%E7%9B%AE%E5%BD%95%EF%BC%89%E6%8C%82%E8%BD%BD-%E6%89%A9%E5%AE%B9/1.png" alt="磁盘信息"></p>
+<p>作为测试，我选取 /dev/sda5, 想要将其挂载到 /home/nutao/disk/D 下面</p>
+<p>查看硬盘使用情况用如下命令：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">df</span> -kh</span><br></pre></td></tr></table></figure>
+<h2 id="2-查看硬盘-UUID-和-磁盘类型"><a href="#2-查看硬盘-UUID-和-磁盘类型" class="headerlink" title="2. 查看硬盘 UUID 和 磁盘类型"></a>2. 查看硬盘 UUID 和 磁盘类型</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo blkid</span><br></pre></td></tr></table></figure>
+<p><img src="/2017/07/17/Ubuntu-%E5%88%86%E5%8C%BA%EF%BC%88%E7%9B%AE%E5%BD%95%EF%BC%89%E6%8C%82%E8%BD%BD-%E6%89%A9%E5%AE%B9/2.png" alt="UUID"></p>
+<p>用记事本或者其他工具记录下 /dev/sda5 的UUID和分区格式（建议将新的硬盘分区为ext4）</p>
+<h2 id="3-取消挂载目标盘"><a href="#3-取消挂载目标盘" class="headerlink" title="3. 取消挂载目标盘"></a>3. 取消挂载目标盘</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo umount /dev/sda5</span><br></pre></td></tr></table></figure>
+<h2 id="4-编辑-etc-fstab-文件"><a href="#4-编辑-etc-fstab-文件" class="headerlink" title="4. 编辑 /etc/fstab 文件"></a>4. 编辑 /etc/fstab 文件</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo vi /etc/fstab</span><br></pre></td></tr></table></figure>
+<p>追加一行内容</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">UUID=0008DCD1000EA709 /home/nutao/disk/D    ntfs    defaults    0   2</span><br></pre></td></tr></table></figure>
+<p>其中第一列为UUID, 第二列为挂载目录（该目录必须为空目录），第三列为文件系统类型，第四列为参数，第五列0表示不备份，最后一列必须为２或0(除非引导分区为1)</p>
+<h2 id="5-更新引导（千万记得更新，否则重启会出错）"><a href="#5-更新引导（千万记得更新，否则重启会出错）" class="headerlink" title="5. 更新引导（千万记得更新，否则重启会出错）"></a>5. 更新引导（千万记得更新，否则重启会出错）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo update-grub</span><br><span class="line">sudo update-grub2</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="Linux下分区工具-gparted"><a href="#Linux下分区工具-gparted" class="headerlink" title="Linux下分区工具 gparted"></a>Linux下分区工具 gparted</h2><p>安装命令</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Debian</span></span><br><span class="line">sudo apt-get install gparted</span><br><span class="line"></span><br><span class="line"><span class="comment"># Fedora</span></span><br><span class="line">su -c <span class="string">&quot;yum install gparted&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># OpenSUSE</span></span><br><span class="line">sudo zypper install gparted</span><br><span class="line"></span><br><span class="line"><span class="comment"># Ubuntu</span></span><br><span class="line">sudo apt-get install gparted</span><br></pre></td></tr></table></figure>
+]]></content>
       <categories>
         <category>Ubuntu</category>
       </categories>
@@ -1040,13 +995,56 @@
       </tags>
   </entry>
   <entry>
+    <title>Ubuntu16.04 Grub Rescue</title>
+    <url>/2017/07/13/Ubuntu16-04-Grub-Rescue/</url>
+    <content><![CDATA[<p>如果某一天, 你不小心扩展了一下你的 / 目录, 又忘记了更新 grub 引导. 不好意思, 你有麻烦了</p>
+<p><img src="/images/1.png" alt="grub"></p>
+<h3 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h3><!-- more  -->
+<h4 id="1-ls-一下所有的盘符"><a href="#1-ls-一下所有的盘符" class="headerlink" title="1. ls 一下所有的盘符"></a>1. ls 一下所有的盘符</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">grub rescue&gt; ls</span><br></pre></td></tr></table></figure>
+<h4 id="2-找-boot-grub的分区"><a href="#2-找-boot-grub的分区" class="headerlink" title="2. 找/boot/grub的分区"></a>2. 找/boot/grub的分区</h4><blockquote>
+<p>如果你的 /boot 没有单独分区, 请执行</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">grub rescue&gt; ls (hd0,msdosx)/boot/grub</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果你的 /boot 单独分区啦, 请执行</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">grub rescue&gt; ls (hd0,msdosx)/grub</span><br></pre></td></tr></table></figure>
+
+<p>ls出如下的目录, 恭喜你找到 /boot 路径了</p>
+<h4 id="3-修复grub引导"><a href="#3-修复grub引导" class="headerlink" title="3. 修复grub引导"></a>3. 修复grub引导</h4><blockquote>
+<p>假设/boot 在(hd0,msdos3) 中</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># /boot 单独分区</span><br><span class="line">set root=(hd0,msdos3)</span><br><span class="line">set prefix=(hd0,msdos3)/grub</span><br><span class="line">insmod normal</span><br><span class="line">normal</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># /boot 没有单独分区</span><br><span class="line">set root=(hd0,msdos3)</span><br><span class="line">set prefix=(hd0,msdos3)/boot/grub</span><br><span class="line">insmod normal</span><br><span class="line">normal</span><br></pre></td></tr></table></figure>
+<p>正常情况下, 执行完后, 电脑就能开机进入桌面啦<br>然后, 还没有结束. (这时千万不要关机, 否则前面步骤再来一次)<br><strong>在正常进入系统以后…</strong></p>
+<h4 id="4-更新系统-grub-引导"><a href="#4-更新系统-grub-引导" class="headerlink" title="4. 更新系统 grub 引导"></a>4. 更新系统 grub 引导</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo update-grub</span><br><span class="line">sudo update-grub2</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>打印出如下日志(我是双系统)</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Generating grub configuration file ...</span><br><span class="line">Found linux image: /boot/vmlinuz-4.4.0-66-generic</span><br><span class="line">Found initrd image: /boot/initrd.img-4.4.0-66-generic</span><br><span class="line">Found memtest86+ image: /memtest86+.elf</span><br><span class="line">Found memtest86+ image: /memtest86+.bin</span><br><span class="line">Found Windows 10 (loader) on /dev/sda1</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>然后重新安装grub</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">nutao@nutao-HP:~$ sudo grub-install /dev/sda</span><br><span class="line"># 日志</span><br><span class="line">Installing for i386-pc platform.</span><br><span class="line">Installation finished. No error reported.</span><br></pre></td></tr></table></figure>
+
+<h4 id="OK-一切搞定"><a href="#OK-一切搞定" class="headerlink" title="OK, 一切搞定"></a>OK, 一切搞定</h4>]]></content>
+      <categories>
+        <category>Ubuntu</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>WSL2: Docker Desktop for Windows</title>
     <url>/2023/06/12/WSL2-Docker-Desktop-for-Windows/</url>
     <content><![CDATA[<p>Docker 是一个用于开发、交付和运行容器的容器化平台。它利用容器技术，将应用程序及其依赖的库、框架、工具等封装在一个虚拟化的容器中，使得应用程序可以在任意环境中运行，并能够快速地进行部署、扩展和管理。利用容器技术，将应用程序及其依赖的库、框架、工具等封装在一个虚拟化的容器中，使得应用程序可以在任意环境中运行，并能够快速地进行部署、扩展和管理。<em>声明：上述介绍由chatGPT生成</em></p>
-<span id="more"></span>
-
-<p><img src="/2023/06/12/WSL2-Docker-Desktop-for-Windows/docker-architecture.svg" alt="docker-architecture"><br><em>source: <a href="https://learn.microsoft.com/zh-cn/training/modules/intro-to-docker-containers/media/2-docker-architecture.svg">https://learn.microsoft.com/zh-cn/training/modules/intro-to-docker-containers/media/2-docker-architecture.svg</a></em></p>
-]]></content>
+<p><img src="/2023/06/12/WSL2-Docker-Desktop-for-Windows/docker-architecture.svg" alt="docker-architecture"><br><em>From: <a href="https://learn.microsoft.com/zh-cn/training/modules/intro-to-docker-containers/media/2-docker-architecture.svg">microsoft-learn</a></em></p>
+<span id="more"></span>]]></content>
       <categories>
         <category>WSL2</category>
       </categories>
@@ -1055,126 +1053,6 @@
         <tag>Docker</tag>
         <tag>WSL2</tag>
         <tag>Windows11</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>docker-db简单配置</title>
-    <url>/2021/09/07/docker-db%E7%AE%80%E5%8D%95%E9%85%8D%E7%BD%AE/</url>
-    <content><![CDATA[<p>一些docker快速启动服务的笔记</p>
-<span id="more"></span>
-
-<h3 id="1-MongoDB-本地服务"><a href="#1-MongoDB-本地服务" class="headerlink" title="1. MongoDB 本地服务"></a>1. MongoDB 本地服务</h3><h4 id="1-1-创建MongoDB容器实例"><a href="#1-1-创建MongoDB容器实例" class="headerlink" title="1.1 创建MongoDB容器实例"></a>1.1 创建MongoDB容器实例</h4><p>GUI 工具：<strong>robo 3t</strong></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建卷</span></span><br><span class="line">docker volume create mongo</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">启动mongo容器实例</span></span><br><span class="line">docker run -p 27017:27017  --restart=always  --mount source=mongo,destination=/var/lib/mongodb --name mongo -d mongo --auth</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">登录container</span></span><br><span class="line">docker exec -it mongo mongo admin</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>添加admin作为<strong>用户管理用户</strong></li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建用户</span></span><br><span class="line">db.createUser(&#123; user:&#x27;admin&#x27;,pwd:&#x27;123456&#x27;,roles:[&#123; role:&#x27;userAdminAnyDatabase&#x27;, db: &#x27;admin&#x27;&#125;]&#125;);</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">登录用户</span></span><br><span class="line">db.auth(&#x27;admin&#x27;,&#x27;123456&#x27;)</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>创建用户和自测用的collection</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">db.createUser(&#123; user:&#x27;nutao&#x27;,pwd:&#x27;123456&#x27;,roles:[ &#123; role:&#x27;dbOwner&#x27;, db: &#x27;nutao&#x27;&#125;]&#125;);</span><br><span class="line">db.auth(&#x27;nutao&#x27;,&#x27;123456&#x27;)</span><br><span class="line">use nutao</span><br><span class="line">db.nutao.insert(&#123;&quot;test&quot;: &quot;test&quot;&#125;)</span><br><span class="line"></span><br><span class="line">db.createUser(&#123; user:&#x27;nutao2&#x27;,pwd:&#x27;123456&#x27;,roles:[&#123; role:&#x27;readWriteAnyDatabase&#x27;, db: &#x27;admin&#x27;&#125;,&#123; role:&#x27;dbAdmin&#x27;, db: &#x27;nutao&#x27;&#125;]&#125;);</span><br></pre></td></tr></table></figure>
-
-<h4 id="1-2-MongoDB内置用户角色"><a href="#1-2-MongoDB内置用户角色" class="headerlink" title="1.2 MongoDB内置用户角色"></a>1.2 MongoDB内置用户角色</h4><ul>
-<li>数据库用户角色：read、readWrite;</li>
-<li>数据库管理角色：dbAdmin、dbOwner、userAdmin；</li>
-<li>集群管理角色：clusterAdmin、clusterManager、clusterMonitor、hostManager；</li>
-<li>备份恢复角色：backup、restore；</li>
-<li>所有数据库角色：readAnyDatabase、readWriteAnyDatabase、userAdminAnyDatabase、dbAdminAnyDatabase</li>
-<li>超级用户角色：root  </li>
-<li>// 这里还有几个角色间接或直接提供了系统超级用户的访问（dbOwner 、userAdmin、userAdminAnyDatabase）</li>
-<li>内部角色：__system </li>
-</ul>
-<p>具体角色的功能： </p>
-<ul>
-<li>Read：允许用户读取指定数据库</li>
-<li>readWrite：允许用户读写指定数据库</li>
-<li>dbAdmin：允许用户在指定数据库中执行管理函数，如索引创建、删除，查看统计或访问system.profile</li>
-<li>userAdmin：允许用户向system.users集合写入，可以找指定数据库里创建、删除和管理用户</li>
-<li>clusterAdmin：只在admin数据库中可用，赋予用户所有分片和复制集相关函数的管理权限。</li>
-<li>readAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的读权限</li>
-<li>readWriteAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的读写权限</li>
-<li>userAdminAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的userAdmin权限</li>
-<li>dbAdminAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的dbAdmin权限。</li>
-<li>root：只在admin数据库中可用。超级账号，超级权限</li>
-</ul>
-<h3 id="2-Redis本地服务"><a href="#2-Redis本地服务" class="headerlink" title="2. Redis本地服务"></a>2. Redis本地服务</h3><h4 id="2-1-创建容器实例"><a href="#2-1-创建容器实例" class="headerlink" title="2.1 创建容器实例"></a>2.1 创建容器实例</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run -itd --name redis -p 6379:6379 -m 500m redis:latest --requirepass &quot;123456&quot; --tcp-keepalive 50</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>参数意思：</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">-d          后台运行容器，并返回容器ID</span><br><span class="line">-i          以交互模式运行容器，通常与 -t 同时使用</span><br><span class="line">-t          为容器重新分配一个伪输入终端，通常与 -i 同时使用</span><br><span class="line">--name      指定容器名称为myredis</span><br><span class="line">-p          指定容器端口</span><br><span class="line">-m          指定容器内存使用限制</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>连接服务</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker exec -it redis redis-cli</span><br><span class="line">127.0.0.1:6379&gt; AUTH 123456</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-Mysql、mariadb本地服务"><a href="#3-Mysql、mariadb本地服务" class="headerlink" title="3. Mysql、mariadb本地服务"></a>3. Mysql、mariadb本地服务</h3><h4 id="3-1-创建容器实例"><a href="#3-1-创建容器实例" class="headerlink" title="3.1 创建容器实例"></a>3.1 创建容器实例</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建卷</span></span><br><span class="line">docker volume create mariadb</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">启动服务</span></span><br><span class="line">docker run -p 3306:3306  --restart=always  --mount source=mariadb,destination=/var/lib/mysql  --name mariadb -e MYSQL_ROOT_PASSWORD=123456 -d mariadb:latest</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">导出</span></span><br><span class="line">mysqldump -uroot -pDo1cloudUserCenter123456 -h 10.22.0.49 -P 3306 usercenter_resource &gt; usercenter_resource.sql</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">导入</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h3 id="4-swagger"><a href="#4-swagger" class="headerlink" title="4. swagger"></a>4. swagger</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker run -p 20000:8080 -v /root/devops/docker-volume/swagger/swagger.json:/app/swagger.json --name swagger swagger:latest</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="5-rabbitMq"><a href="#5-rabbitMq" class="headerlink" title="5 rabbitMq"></a>5 rabbitMq</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker run -d --hostname my-rabbit --name rabbitmq -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin -p 15672:15672 -p 5672:5672 -p 25672:25672 -p 61613:61613 -p 1883:1883 rabbitmq:management</span><br></pre></td></tr></table></figure>
-
-<ol>
-<li>15672：控制台端口号</li>
-<li>5672：应用访问端口号</li>
-</ol>
-<h3 id="6-postgresql"><a href="#6-postgresql" class="headerlink" title="6. postgresql"></a>6. postgresql</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 创建卷</span></span><br><span class="line">docker volume create pgsql </span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建容器</span></span><br><span class="line">docker run --name postgres -e POSTGRES_PASSWORD=123456 -p 5432:5432  --restart=always  --mount <span class="built_in">source</span>=pgsql,destination=/var/lib/postgresql  -d postgres:latest</span><br><span class="line"></span><br><span class="line"><span class="comment"># 账号 postgres 123456</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>常用命令</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">除了前面已经用到的\password命令（设置密码）和\q命令（退出）以外，控制台还提供一系列其他命令。</span><br><span class="line">\h：查看SQL命令的解释，比如\h select。</span><br><span class="line">\?：查看psql命令列表。</span><br><span class="line">\l：列出所有数据库。</span><br><span class="line">\c [database_name]：连接其他数据库。</span><br><span class="line">\d：列出当前数据库的所有表格。</span><br><span class="line">\d [table_name]：列出某一张表格的结构。</span><br><span class="line">\du：列出所有用户。</span><br><span class="line">\e：打开文本编辑器。</span><br><span class="line">\conninfo：列出当前数据库和连接的信息。</span><br><span class="line">\x: 转换为列模式</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>查询表结构</li>
-</ul>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">	a.attnum  <span class="keyword">AS</span> &quot;id&quot;,</span><br><span class="line">	c.relname <span class="keyword">AS</span> &quot;表名&quot;,</span><br><span class="line">	<span class="built_in">CAST</span>(obj_description(relfilenode, <span class="string">&#x27;pg_class&#x27;</span>) <span class="keyword">as</span> <span class="type">VARCHAR</span> ) <span class="keyword">as</span> &quot;table desc&quot;,</span><br><span class="line">	a.attname <span class="keyword">as</span> &quot;column name&quot;,</span><br><span class="line">	concat_ws(<span class="string">&#x27;&#x27;</span>, t.typname, <span class="built_in">SUBSTRING</span>(format_type(a.atttypid, a.atttypmod) <span class="keyword">FROM</span> <span class="string">&#x27;\(.*\)&#x27;</span>)) <span class="keyword">as</span> &quot;column type&quot;,</span><br><span class="line">	d.description <span class="keyword">as</span> &quot;COLUMN comment&quot;</span><br><span class="line"><span class="keyword">FROM</span> </span><br><span class="line">	pg_class <span class="keyword">as</span> c, pg_attribute <span class="keyword">as</span> a, pg_type <span class="keyword">as</span> t, pg_description <span class="keyword">as</span> d</span><br><span class="line"><span class="keyword">WHERE</span> c.relname <span class="operator">=</span> <span class="string">&#x27;mfa_consul_order&#x27;</span></span><br><span class="line">	<span class="keyword">AND</span> a.attnum <span class="operator">&gt;</span> <span class="number">0</span></span><br><span class="line">	<span class="keyword">AND</span> a.attrelid <span class="operator">=</span> c.oid</span><br><span class="line">	<span class="keyword">AND</span> a.atttypid <span class="operator">=</span> t.oid</span><br><span class="line">	<span class="keyword">AND</span> d.objoid <span class="operator">=</span> a.attrelid</span><br><span class="line">	<span class="keyword">AND</span> d.objsubid <span class="operator">=</span> a.attnum</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> c.relname <span class="keyword">DESC</span>, a.attnum <span class="keyword">ASC</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>查询db占用空间</li>
-</ul>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> pg_database.datname, pg_size_pretty (pg_database_size(pg_database.datname)) <span class="keyword">AS</span> size <span class="keyword">from</span> pg_database; </span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="7-Consul"><a href="#7-Consul" class="headerlink" title="7.  Consul"></a>7.  Consul</h3><ul>
-<li><p>创建单机consul</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run -d --name=consul-node1 -p 8500:8500 -e CONSUL_BIND_INTERFACE=eth0 consul:1.10</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>创建集群</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看第一个节点的IP</span></span><br><span class="line">docker inspect -f=&#x27;&#123;&#123;.NetworkSettings.IPAddress&#125;&#125;&#x27; consul-node1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建并启动第二个节点，172.17.0.3是第一个节点的IP</span></span><br><span class="line">docker run -d --name=consul-node2 -p 8501:8500 -e CONSUL_BIND_INTERFACE=eth0 consul:1.10 agent -dev -join=172.17.0.3</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建并启动第三个节点，172.17.0.3是第一个节点的IP</span></span><br><span class="line">docker run -d --name=consul-node3 -p 8502:8500 -e CONSUL_BIND_INTERFACE=eth0 consul:1.10 agent -dev -join=172.17.0.3</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">在第一个容器中运行consul命令来查询集群中的所有成员</span></span><br><span class="line">docker exec -t consul-node1 consul members</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>目录说明</p>
-<ul>
-<li>/consul/data：Consul 存放数据的目录</li>
-<li>/consul/config：Consul 存放配置文件的目录</li>
-</ul>
-</li>
-</ul>
-<h3 id="8-Minio（块存储）"><a href="#8-Minio（块存储）" class="headerlink" title="8 Minio（块存储）"></a>8 Minio（块存储）</h3><p><a href="http://docs.minio.org.cn/docs/master/minio-erasure-code-quickstart-guide">http://docs.minio.org.cn/docs/master/minio-erasure-code-quickstart-guide</a></p>
-<ul>
-<li>单机单节点运行</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run -p 9000:9000 --name minio1 \</span><br><span class="line">  -e &quot;MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE&quot; \</span><br><span class="line">  -e &quot;MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&quot; \</span><br><span class="line">  -v /mnt/data:/data \</span><br><span class="line">  -v /mnt/config:/root/.minio \</span><br><span class="line">  minio/minio server /data</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>以纠删码模式运行Minio (8个盘)</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run -p 9000:9000 --name minio \</span><br><span class="line">  -v /mnt/data1:/data1 \</span><br><span class="line">  -v /mnt/data2:/data2 \</span><br><span class="line">  -v /mnt/data3:/data3 \</span><br><span class="line">  -v /mnt/data4:/data4 \</span><br><span class="line">  -v /mnt/data5:/data5 \</span><br><span class="line">  -v /mnt/data6:/data6 \</span><br><span class="line">  -v /mnt/data7:/data7 \</span><br><span class="line">  -v /mnt/data8:/data8 \</span><br><span class="line">  minio/minio:latest server --console-address &quot;:9999&quot; /data1 /data2 /data3 /data4 /data5 /data6 /data7 /data8</span><br></pre></td></tr></table></figure>
-
-
-]]></content>
-      <categories>
-        <category>Docker</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>Docker</tag>
       </tags>
   </entry>
   <entry>
@@ -1350,6 +1228,126 @@
       </categories>
       <tags>
         <tag>git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>docker-db简单配置</title>
+    <url>/2021/09/07/docker-db%E7%AE%80%E5%8D%95%E9%85%8D%E7%BD%AE/</url>
+    <content><![CDATA[<p>一些docker快速启动服务的笔记</p>
+<span id="more"></span>
+
+<h3 id="1-MongoDB-本地服务"><a href="#1-MongoDB-本地服务" class="headerlink" title="1. MongoDB 本地服务"></a>1. MongoDB 本地服务</h3><h4 id="1-1-创建MongoDB容器实例"><a href="#1-1-创建MongoDB容器实例" class="headerlink" title="1.1 创建MongoDB容器实例"></a>1.1 创建MongoDB容器实例</h4><p>GUI 工具：<strong>robo 3t</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建卷</span></span><br><span class="line">docker volume create mongo</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">启动mongo容器实例</span></span><br><span class="line">docker run -p 27017:27017  --restart=always  --mount source=mongo,destination=/var/lib/mongodb --name mongo -d mongo --auth</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">登录container</span></span><br><span class="line">docker exec -it mongo mongo admin</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>添加admin作为<strong>用户管理用户</strong></li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建用户</span></span><br><span class="line">db.createUser(&#123; user:&#x27;admin&#x27;,pwd:&#x27;123456&#x27;,roles:[&#123; role:&#x27;userAdminAnyDatabase&#x27;, db: &#x27;admin&#x27;&#125;]&#125;);</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">登录用户</span></span><br><span class="line">db.auth(&#x27;admin&#x27;,&#x27;123456&#x27;)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>创建用户和自测用的collection</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">db.createUser(&#123; user:&#x27;nutao&#x27;,pwd:&#x27;123456&#x27;,roles:[ &#123; role:&#x27;dbOwner&#x27;, db: &#x27;nutao&#x27;&#125;]&#125;);</span><br><span class="line">db.auth(&#x27;nutao&#x27;,&#x27;123456&#x27;)</span><br><span class="line">use nutao</span><br><span class="line">db.nutao.insert(&#123;&quot;test&quot;: &quot;test&quot;&#125;)</span><br><span class="line"></span><br><span class="line">db.createUser(&#123; user:&#x27;nutao2&#x27;,pwd:&#x27;123456&#x27;,roles:[&#123; role:&#x27;readWriteAnyDatabase&#x27;, db: &#x27;admin&#x27;&#125;,&#123; role:&#x27;dbAdmin&#x27;, db: &#x27;nutao&#x27;&#125;]&#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-2-MongoDB内置用户角色"><a href="#1-2-MongoDB内置用户角色" class="headerlink" title="1.2 MongoDB内置用户角色"></a>1.2 MongoDB内置用户角色</h4><ul>
+<li>数据库用户角色：read、readWrite;</li>
+<li>数据库管理角色：dbAdmin、dbOwner、userAdmin；</li>
+<li>集群管理角色：clusterAdmin、clusterManager、clusterMonitor、hostManager；</li>
+<li>备份恢复角色：backup、restore；</li>
+<li>所有数据库角色：readAnyDatabase、readWriteAnyDatabase、userAdminAnyDatabase、dbAdminAnyDatabase</li>
+<li>超级用户角色：root  </li>
+<li>// 这里还有几个角色间接或直接提供了系统超级用户的访问（dbOwner 、userAdmin、userAdminAnyDatabase）</li>
+<li>内部角色：__system </li>
+</ul>
+<p>具体角色的功能： </p>
+<ul>
+<li>Read：允许用户读取指定数据库</li>
+<li>readWrite：允许用户读写指定数据库</li>
+<li>dbAdmin：允许用户在指定数据库中执行管理函数，如索引创建、删除，查看统计或访问system.profile</li>
+<li>userAdmin：允许用户向system.users集合写入，可以找指定数据库里创建、删除和管理用户</li>
+<li>clusterAdmin：只在admin数据库中可用，赋予用户所有分片和复制集相关函数的管理权限。</li>
+<li>readAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的读权限</li>
+<li>readWriteAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的读写权限</li>
+<li>userAdminAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的userAdmin权限</li>
+<li>dbAdminAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的dbAdmin权限。</li>
+<li>root：只在admin数据库中可用。超级账号，超级权限</li>
+</ul>
+<h3 id="2-Redis本地服务"><a href="#2-Redis本地服务" class="headerlink" title="2. Redis本地服务"></a>2. Redis本地服务</h3><h4 id="2-1-创建容器实例"><a href="#2-1-创建容器实例" class="headerlink" title="2.1 创建容器实例"></a>2.1 创建容器实例</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run -itd --name redis -p 6379:6379 -m 500m redis:latest --requirepass &quot;123456&quot; --tcp-keepalive 50</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>参数意思：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">-d          后台运行容器，并返回容器ID</span><br><span class="line">-i          以交互模式运行容器，通常与 -t 同时使用</span><br><span class="line">-t          为容器重新分配一个伪输入终端，通常与 -i 同时使用</span><br><span class="line">--name      指定容器名称为myredis</span><br><span class="line">-p          指定容器端口</span><br><span class="line">-m          指定容器内存使用限制</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>连接服务</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker exec -it redis redis-cli</span><br><span class="line">127.0.0.1:6379&gt; AUTH 123456</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-Mysql、mariadb本地服务"><a href="#3-Mysql、mariadb本地服务" class="headerlink" title="3. Mysql、mariadb本地服务"></a>3. Mysql、mariadb本地服务</h3><h4 id="3-1-创建容器实例"><a href="#3-1-创建容器实例" class="headerlink" title="3.1 创建容器实例"></a>3.1 创建容器实例</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建卷</span></span><br><span class="line">docker volume create mariadb</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">启动服务</span></span><br><span class="line">docker run -p 3306:3306  --restart=always  --mount source=mariadb,destination=/var/lib/mysql  --name mariadb -e MYSQL_ROOT_PASSWORD=123456 -d mariadb:latest</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">导出</span></span><br><span class="line">mysqldump -uroot -pDo1cloudUserCenter123456 -h 10.22.0.49 -P 3306 usercenter_resource &gt; usercenter_resource.sql</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">导入</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-swagger"><a href="#4-swagger" class="headerlink" title="4. swagger"></a>4. swagger</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker run -p 20000:8080 -v /root/devops/docker-volume/swagger/swagger.json:/app/swagger.json --name swagger swagger:latest</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="5-rabbitMq"><a href="#5-rabbitMq" class="headerlink" title="5 rabbitMq"></a>5 rabbitMq</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker run -d --hostname my-rabbit --name rabbitmq -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin -p 15672:15672 -p 5672:5672 -p 25672:25672 -p 61613:61613 -p 1883:1883 rabbitmq:management</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>15672：控制台端口号</li>
+<li>5672：应用访问端口号</li>
+</ol>
+<h3 id="6-postgresql"><a href="#6-postgresql" class="headerlink" title="6. postgresql"></a>6. postgresql</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 创建卷</span></span><br><span class="line">docker volume create pgsql </span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建容器</span></span><br><span class="line">docker run --name postgres -e POSTGRES_PASSWORD=123456 -p 5432:5432  --restart=always  --mount <span class="built_in">source</span>=pgsql,destination=/var/lib/postgresql  -d postgres:latest</span><br><span class="line"></span><br><span class="line"><span class="comment"># 账号 postgres 123456</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>常用命令</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">除了前面已经用到的\password命令（设置密码）和\q命令（退出）以外，控制台还提供一系列其他命令。</span><br><span class="line">\h：查看SQL命令的解释，比如\h select。</span><br><span class="line">\?：查看psql命令列表。</span><br><span class="line">\l：列出所有数据库。</span><br><span class="line">\c [database_name]：连接其他数据库。</span><br><span class="line">\d：列出当前数据库的所有表格。</span><br><span class="line">\d [table_name]：列出某一张表格的结构。</span><br><span class="line">\du：列出所有用户。</span><br><span class="line">\e：打开文本编辑器。</span><br><span class="line">\conninfo：列出当前数据库和连接的信息。</span><br><span class="line">\x: 转换为列模式</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查询表结构</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">	a.attnum  <span class="keyword">AS</span> &quot;id&quot;,</span><br><span class="line">	c.relname <span class="keyword">AS</span> &quot;表名&quot;,</span><br><span class="line">	<span class="built_in">CAST</span>(obj_description(relfilenode, <span class="string">&#x27;pg_class&#x27;</span>) <span class="keyword">as</span> <span class="type">VARCHAR</span> ) <span class="keyword">as</span> &quot;table desc&quot;,</span><br><span class="line">	a.attname <span class="keyword">as</span> &quot;column name&quot;,</span><br><span class="line">	concat_ws(<span class="string">&#x27;&#x27;</span>, t.typname, <span class="built_in">SUBSTRING</span>(format_type(a.atttypid, a.atttypmod) <span class="keyword">FROM</span> <span class="string">&#x27;\(.*\)&#x27;</span>)) <span class="keyword">as</span> &quot;column type&quot;,</span><br><span class="line">	d.description <span class="keyword">as</span> &quot;COLUMN comment&quot;</span><br><span class="line"><span class="keyword">FROM</span> </span><br><span class="line">	pg_class <span class="keyword">as</span> c, pg_attribute <span class="keyword">as</span> a, pg_type <span class="keyword">as</span> t, pg_description <span class="keyword">as</span> d</span><br><span class="line"><span class="keyword">WHERE</span> c.relname <span class="operator">=</span> <span class="string">&#x27;mfa_consul_order&#x27;</span></span><br><span class="line">	<span class="keyword">AND</span> a.attnum <span class="operator">&gt;</span> <span class="number">0</span></span><br><span class="line">	<span class="keyword">AND</span> a.attrelid <span class="operator">=</span> c.oid</span><br><span class="line">	<span class="keyword">AND</span> a.atttypid <span class="operator">=</span> t.oid</span><br><span class="line">	<span class="keyword">AND</span> d.objoid <span class="operator">=</span> a.attrelid</span><br><span class="line">	<span class="keyword">AND</span> d.objsubid <span class="operator">=</span> a.attnum</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> c.relname <span class="keyword">DESC</span>, a.attnum <span class="keyword">ASC</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查询db占用空间</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> pg_database.datname, pg_size_pretty (pg_database_size(pg_database.datname)) <span class="keyword">AS</span> size <span class="keyword">from</span> pg_database; </span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="7-Consul"><a href="#7-Consul" class="headerlink" title="7.  Consul"></a>7.  Consul</h3><ul>
+<li><p>创建单机consul</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run -d --name=consul-node1 -p 8500:8500 -e CONSUL_BIND_INTERFACE=eth0 consul:1.10</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建集群</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看第一个节点的IP</span></span><br><span class="line">docker inspect -f=&#x27;&#123;&#123;.NetworkSettings.IPAddress&#125;&#125;&#x27; consul-node1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建并启动第二个节点，172.17.0.3是第一个节点的IP</span></span><br><span class="line">docker run -d --name=consul-node2 -p 8501:8500 -e CONSUL_BIND_INTERFACE=eth0 consul:1.10 agent -dev -join=172.17.0.3</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建并启动第三个节点，172.17.0.3是第一个节点的IP</span></span><br><span class="line">docker run -d --name=consul-node3 -p 8502:8500 -e CONSUL_BIND_INTERFACE=eth0 consul:1.10 agent -dev -join=172.17.0.3</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">在第一个容器中运行consul命令来查询集群中的所有成员</span></span><br><span class="line">docker exec -t consul-node1 consul members</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>目录说明</p>
+<ul>
+<li>/consul/data：Consul 存放数据的目录</li>
+<li>/consul/config：Consul 存放配置文件的目录</li>
+</ul>
+</li>
+</ul>
+<h3 id="8-Minio（块存储）"><a href="#8-Minio（块存储）" class="headerlink" title="8 Minio（块存储）"></a>8 Minio（块存储）</h3><p><a href="http://docs.minio.org.cn/docs/master/minio-erasure-code-quickstart-guide">http://docs.minio.org.cn/docs/master/minio-erasure-code-quickstart-guide</a></p>
+<ul>
+<li>单机单节点运行</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run -p 9000:9000 --name minio1 \</span><br><span class="line">  -e &quot;MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE&quot; \</span><br><span class="line">  -e &quot;MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&quot; \</span><br><span class="line">  -v /mnt/data:/data \</span><br><span class="line">  -v /mnt/config:/root/.minio \</span><br><span class="line">  minio/minio server /data</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>以纠删码模式运行Minio (8个盘)</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run -p 9000:9000 --name minio \</span><br><span class="line">  -v /mnt/data1:/data1 \</span><br><span class="line">  -v /mnt/data2:/data2 \</span><br><span class="line">  -v /mnt/data3:/data3 \</span><br><span class="line">  -v /mnt/data4:/data4 \</span><br><span class="line">  -v /mnt/data5:/data5 \</span><br><span class="line">  -v /mnt/data6:/data6 \</span><br><span class="line">  -v /mnt/data7:/data7 \</span><br><span class="line">  -v /mnt/data8:/data8 \</span><br><span class="line">  minio/minio:latest server --console-address &quot;:9999&quot; /data1 /data2 /data3 /data4 /data5 /data6 /data7 /data8</span><br></pre></td></tr></table></figure>
+
+
+]]></content>
+      <categories>
+        <category>Docker</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Docker</tag>
       </tags>
   </entry>
   <entry>
