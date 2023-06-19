@@ -111,3 +111,5 @@ docker run -p 8080:80 --name ng --rm nginx:v1
 
 > *From: [microsoft-learn](https://learn.microsoft.com/zh-cn/training/modules/intro-to-docker-containers/media/3-unionfs-diagram.svg)*
 
+> 一起探讨更多的技术细节，试试关注公众号CodeShow
+![wechat](./Docker%E5%85%A5%E9%97%A8%E4%B8%80/CodeShowWechat_End.png)
