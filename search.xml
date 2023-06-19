@@ -839,6 +839,115 @@
       </tags>
   </entry>
   <entry>
+    <title>Ubuntu 换源，安装&amp;卸载软件</title>
+    <url>/2017/07/17/Ubuntu-%E6%8D%A2%E6%BA%90%EF%BC%8C%E5%AE%89%E8%A3%85-%E5%8D%B8%E8%BD%BD%E8%BD%AF%E4%BB%B6/</url>
+    <content><![CDATA[<p>国内的筒子们，经常发现在update的时候各种卡。。。有时候心情好，等等也就罢了。万一某一天急着安装软件，那种状态下，真的是多等一秒感觉都是心烦气躁的。所以，本文就来跟大家聊聊在Ubuntu 中换源，安装&amp;卸载软件的那些事，欢迎各位一起交流。。。<br><img src="/images/ubuntu16.04.png" alt="Ubuntu16.04"></p>
+<span id="more"></span>
+<h2 id="1-查找国内的开源镜像提供的源地址"><a href="#1-查找国内的开源镜像提供的源地址" class="headerlink" title="1. 查找国内的开源镜像提供的源地址"></a>1. 查找国内的开源镜像提供的源地址</h2><blockquote>
+<p>Ubuntu的源的list文件位于 <code>/etc/apt/sources.list</code></p>
+</blockquote>
+<ul>
+<li>高校镜像源（国内其他大学也有提供，可自行查找）<br><a href="http://link.zhihu.com/?target=https%3A//mirrors.tuna.tsinghua.edu.cn/help/ubuntu/" title="清华大学开源镜像站">清华大学开源镜像站 </a><br><a href="http://link.zhihu.com/?target=https%3A//mirrors.ustc.edu.cn/repogen/" title="中科大开源镜像站">中科大开源镜像站</a></li>
+</ul>
+<ul>
+<li>企业镜像源（其他企业的请自行查找）<br><a href="http://link.zhihu.com/?target=http%3A//mirrors.aliyun.com/help/ubuntu" title="阿里云开源镜像站">阿里云开源镜像站 </a><br><a href="http://link.zhihu.com/?target=http%3A//mirrors.163.com/.help/ubuntu.html" title="网易开源镜像站">网易开源镜像站</a></li>
+</ul>
+<p><strong>这里以清华源为例</strong></p>
+<p>先去查一下清华源的帮助文档，戳 <a href="http://link.zhihu.com/?target=https%3A//mirrors.tuna.tsinghua.edu.cn/help/ubuntu/" title="清华大学开源镜像站">清华大学开源镜像站 </a>，选择相匹配的Ubuntu的版本，会得到软件源镜像的地址。</p>
+<p>接下来直接替换一下系统的source.list文件<del>~</del></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 备份一下</span></span><br><span class="line">sudo <span class="built_in">cp</span> /etc/apt/sources.list /etc/apt/sources.list.bak</span><br><span class="line"><span class="comment"># 修改</span></span><br><span class="line">sudo vi /etc/apt/sources.list</span><br></pre></td></tr></table></figure>
+<p>将文档里面所有的内容删除，然后替换为清华镜像提供的软件源镜像的地址。<br>例如我用的 16.04 版， 替换为：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted universe multiverse</span></span><br></pre></td></tr></table></figure>
+<p>然后再update一下，你会发现速度还是有明显的提升的。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt update</span><br></pre></td></tr></table></figure>
+<h2 id="2-使用apt安装软件"><a href="#2-使用apt安装软件" class="headerlink" title="2. 使用apt安装软件"></a>2. 使用apt安装软件</h2><p>这个就不多说了，比较简单，譬如安装tree</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt install tree -y</span><br></pre></td></tr></table></figure>
+<p>这里的 -y 参数是为了在安装的时候默认选择yes</p>
+<h2 id="3-deb包安装-amp-卸载（需要先下载好）"><a href="#3-deb包安装-amp-卸载（需要先下载好）" class="headerlink" title="3. deb包安装&amp;卸载（需要先下载好）"></a>3. deb包安装&amp;卸载（需要先下载好）</h2><ul>
+<li>安装命令<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo dpkg -i xxx.deb</span><br></pre></td></tr></table></figure></li>
+<li>安装依赖（如果提示需要的话）<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get install -f</span><br></pre></td></tr></table></figure></li>
+<li>自动清除残留配置文件<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get autoclean</span><br><span class="line">sudo apt-get autoremove</span><br></pre></td></tr></table></figure></li>
+<li>完全卸载<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get remove --purge name</span><br></pre></td></tr></table></figure>
+一般来说，这样的卸载会比较干净地卸载掉软件。有些没有办法自动删除的文件，可以手动去删除掉</li>
+</ul>
+<h2 id="4-另一种deb包安装方式"><a href="#4-另一种deb包安装方式" class="headerlink" title="4. 另一种deb包安装方式"></a>4. 另一种deb包安装方式</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># cd到安装包目录</span></span><br><span class="line">sudo apt install ./xxxx.deb</span><br></pre></td></tr></table></figure>
+<h2 id="5-安装filename-tar-gz软件"><a href="#5-安装filename-tar-gz软件" class="headerlink" title="5. 安装filename.tar.gz软件"></a>5. 安装filename.tar.gz软件</h2><ul>
+<li>解压</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tar -xzvf file.tar.gz</span><br></pre></td></tr></table></figure>
+<ul>
+<li>然后在解压目录或者bin文件夹中执行setup.sh文件。。。这个一般不定，安装前最好查一下官网说明</li>
+</ul>
+<h2 id="6-源码安装"><a href="#6-源码安装" class="headerlink" title="6. 源码安装"></a>6. 源码安装</h2><p>有些软件没有被收录进软件镜像源，或者说开发者需要去使用他们最新的版本，这时候就要自己去他们的官网或者是代码托管平台下载最新的Linux源码，自己来build。</p>
+<p>这种方式安装需<strong>要解决很多的依赖</strong>。。。。安装前，多问问度娘，Google</p>
+<p>此处还是以tree为例：</p>
+<ul>
+<li>先去 <a href="http://link.zhihu.com/?target=ftp%3A//mama.indstate.edu/linux/tree/" title="Tree FTP">Tree FTP</a> 下载最新的源码包</li>
+<li>解压</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tar zxf tree-1.7.0.tgz</span><br><span class="line"><span class="built_in">cd</span>  tree-1.7.0/</span><br><span class="line">make and install</span><br><span class="line">sudo make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
+<p><strong>如果没有配置g++环境，先用apt安装build-essential</strong></p>
+<ul>
+<li>OK, 大功告成<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nutao@master:~/Public/tree-1.7.0$ tree</span><br><span class="line">.</span><br><span class="line">├── CHANGES</span><br><span class="line">├── color.c</span><br><span class="line">├── color.o</span><br><span class="line">├── doc</span><br><span class="line">│   ├── tree.1</span><br><span class="line">│   ├── tree.1.fr</span><br><span class="line">│   └── xml.dtd</span><br><span class="line">├── hash.c</span><br><span class="line">├── hash.o</span><br><span class="line">├── html.c</span><br><span class="line">├── html.o</span><br><span class="line">├── INSTALL</span><br><span class="line">├── json.c</span><br><span class="line">├── json.o</span><br><span class="line">├── LICENSE</span><br><span class="line">├── Makefile</span><br><span class="line">├── README</span><br><span class="line">├── strverscmp.c</span><br><span class="line">├── TODO</span><br><span class="line">├── tree</span><br><span class="line">├── tree.c</span><br><span class="line">├── tree.h</span><br><span class="line">├── tree.o</span><br><span class="line">├── unix.c</span><br><span class="line">├── unix.o</span><br><span class="line">├── xml.c</span><br><span class="line">└── xml.o</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="常用压缩文件的解压命令"><a href="#常用压缩文件的解压命令" class="headerlink" title="常用压缩文件的解压命令"></a>常用压缩文件的解压命令</h2><p>1、<em>.tar 用 tar –xvf 解压<br>2、</em>.gz 用 gzip -d或者gunzip 解压<br>3、.tar.gz和.tgz 用 tar –xzf 解压<br>4、<em>.bz2 用 bzip2 -d或者用bunzip2 解压<br>5、</em>.tar.bz2用tar –xjf 解压<br>6、<em>.Z 用 uncompress 解压<br>7、</em>.tar.Z 用tar –xZf 解压<br>8、<em>.rar 用 unrar e解压<br>9、</em>.zip 用 unzip 解压</p>
+]]></content>
+      <categories>
+        <category>Ubuntu</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Ubuntu16.04 Grub Rescue</title>
+    <url>/2017/07/13/Ubuntu16-04-Grub-Rescue/</url>
+    <content><![CDATA[<p>如果某一天, 你不小心扩展了一下你的 / 目录, 又忘记了更新 grub 引导. 不好意思, 你有麻烦了</p>
+<p><img src="/images/1.png" alt="grub"></p>
+<h3 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h3><!-- more  -->
+<h4 id="1-ls-一下所有的盘符"><a href="#1-ls-一下所有的盘符" class="headerlink" title="1. ls 一下所有的盘符"></a>1. ls 一下所有的盘符</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">grub rescue&gt; ls</span><br></pre></td></tr></table></figure>
+<h4 id="2-找-boot-grub的分区"><a href="#2-找-boot-grub的分区" class="headerlink" title="2. 找/boot/grub的分区"></a>2. 找/boot/grub的分区</h4><blockquote>
+<p>如果你的 /boot 没有单独分区, 请执行</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">grub rescue&gt; ls (hd0,msdosx)/boot/grub</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果你的 /boot 单独分区啦, 请执行</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">grub rescue&gt; ls (hd0,msdosx)/grub</span><br></pre></td></tr></table></figure>
+
+<p>ls出如下的目录, 恭喜你找到 /boot 路径了</p>
+<h4 id="3-修复grub引导"><a href="#3-修复grub引导" class="headerlink" title="3. 修复grub引导"></a>3. 修复grub引导</h4><blockquote>
+<p>假设/boot 在(hd0,msdos3) 中</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># /boot 单独分区</span><br><span class="line">set root=(hd0,msdos3)</span><br><span class="line">set prefix=(hd0,msdos3)/grub</span><br><span class="line">insmod normal</span><br><span class="line">normal</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># /boot 没有单独分区</span><br><span class="line">set root=(hd0,msdos3)</span><br><span class="line">set prefix=(hd0,msdos3)/boot/grub</span><br><span class="line">insmod normal</span><br><span class="line">normal</span><br></pre></td></tr></table></figure>
+<p>正常情况下, 执行完后, 电脑就能开机进入桌面啦<br>然后, 还没有结束. (这时千万不要关机, 否则前面步骤再来一次)<br><strong>在正常进入系统以后…</strong></p>
+<h4 id="4-更新系统-grub-引导"><a href="#4-更新系统-grub-引导" class="headerlink" title="4. 更新系统 grub 引导"></a>4. 更新系统 grub 引导</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo update-grub</span><br><span class="line">sudo update-grub2</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>打印出如下日志(我是双系统)</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Generating grub configuration file ...</span><br><span class="line">Found linux image: /boot/vmlinuz-4.4.0-66-generic</span><br><span class="line">Found initrd image: /boot/initrd.img-4.4.0-66-generic</span><br><span class="line">Found memtest86+ image: /memtest86+.elf</span><br><span class="line">Found memtest86+ image: /memtest86+.bin</span><br><span class="line">Found Windows 10 (loader) on /dev/sda1</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>然后重新安装grub</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">nutao@nutao-HP:~$ sudo grub-install /dev/sda</span><br><span class="line"># 日志</span><br><span class="line">Installing for i386-pc platform.</span><br><span class="line">Installation finished. No error reported.</span><br></pre></td></tr></table></figure>
+
+<h4 id="OK-一切搞定"><a href="#OK-一切搞定" class="headerlink" title="OK, 一切搞定"></a>OK, 一切搞定</h4>]]></content>
+      <categories>
+        <category>Ubuntu</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Redis常用数据结构</title>
     <url>/2020/03/15/Redis%E5%B8%B8%E7%94%A8%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</url>
     <content><![CDATA[<p>Redis是一个开源的使用ANSI C语言编写、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库。<br>官方线上Tutoral：<a href="http://try.redis.io/">http://try.redis.io/</a></p>
@@ -1000,115 +1109,6 @@
       </categories>
       <tags>
         <tag>Redis</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Ubuntu 换源，安装&amp;卸载软件</title>
-    <url>/2017/07/17/Ubuntu-%E6%8D%A2%E6%BA%90%EF%BC%8C%E5%AE%89%E8%A3%85-%E5%8D%B8%E8%BD%BD%E8%BD%AF%E4%BB%B6/</url>
-    <content><![CDATA[<p>国内的筒子们，经常发现在update的时候各种卡。。。有时候心情好，等等也就罢了。万一某一天急着安装软件，那种状态下，真的是多等一秒感觉都是心烦气躁的。所以，本文就来跟大家聊聊在Ubuntu 中换源，安装&amp;卸载软件的那些事，欢迎各位一起交流。。。<br><img src="/images/ubuntu16.04.png" alt="Ubuntu16.04"></p>
-<span id="more"></span>
-<h2 id="1-查找国内的开源镜像提供的源地址"><a href="#1-查找国内的开源镜像提供的源地址" class="headerlink" title="1. 查找国内的开源镜像提供的源地址"></a>1. 查找国内的开源镜像提供的源地址</h2><blockquote>
-<p>Ubuntu的源的list文件位于 <code>/etc/apt/sources.list</code></p>
-</blockquote>
-<ul>
-<li>高校镜像源（国内其他大学也有提供，可自行查找）<br><a href="http://link.zhihu.com/?target=https%3A//mirrors.tuna.tsinghua.edu.cn/help/ubuntu/" title="清华大学开源镜像站">清华大学开源镜像站 </a><br><a href="http://link.zhihu.com/?target=https%3A//mirrors.ustc.edu.cn/repogen/" title="中科大开源镜像站">中科大开源镜像站</a></li>
-</ul>
-<ul>
-<li>企业镜像源（其他企业的请自行查找）<br><a href="http://link.zhihu.com/?target=http%3A//mirrors.aliyun.com/help/ubuntu" title="阿里云开源镜像站">阿里云开源镜像站 </a><br><a href="http://link.zhihu.com/?target=http%3A//mirrors.163.com/.help/ubuntu.html" title="网易开源镜像站">网易开源镜像站</a></li>
-</ul>
-<p><strong>这里以清华源为例</strong></p>
-<p>先去查一下清华源的帮助文档，戳 <a href="http://link.zhihu.com/?target=https%3A//mirrors.tuna.tsinghua.edu.cn/help/ubuntu/" title="清华大学开源镜像站">清华大学开源镜像站 </a>，选择相匹配的Ubuntu的版本，会得到软件源镜像的地址。</p>
-<p>接下来直接替换一下系统的source.list文件<del>~</del></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 备份一下</span></span><br><span class="line">sudo <span class="built_in">cp</span> /etc/apt/sources.list /etc/apt/sources.list.bak</span><br><span class="line"><span class="comment"># 修改</span></span><br><span class="line">sudo vi /etc/apt/sources.list</span><br></pre></td></tr></table></figure>
-<p>将文档里面所有的内容删除，然后替换为清华镜像提供的软件源镜像的地址。<br>例如我用的 16.04 版， 替换为：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted universe multiverse</span></span><br></pre></td></tr></table></figure>
-<p>然后再update一下，你会发现速度还是有明显的提升的。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt update</span><br></pre></td></tr></table></figure>
-<h2 id="2-使用apt安装软件"><a href="#2-使用apt安装软件" class="headerlink" title="2. 使用apt安装软件"></a>2. 使用apt安装软件</h2><p>这个就不多说了，比较简单，譬如安装tree</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt install tree -y</span><br></pre></td></tr></table></figure>
-<p>这里的 -y 参数是为了在安装的时候默认选择yes</p>
-<h2 id="3-deb包安装-amp-卸载（需要先下载好）"><a href="#3-deb包安装-amp-卸载（需要先下载好）" class="headerlink" title="3. deb包安装&amp;卸载（需要先下载好）"></a>3. deb包安装&amp;卸载（需要先下载好）</h2><ul>
-<li>安装命令<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo dpkg -i xxx.deb</span><br></pre></td></tr></table></figure></li>
-<li>安装依赖（如果提示需要的话）<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get install -f</span><br></pre></td></tr></table></figure></li>
-<li>自动清除残留配置文件<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get autoclean</span><br><span class="line">sudo apt-get autoremove</span><br></pre></td></tr></table></figure></li>
-<li>完全卸载<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get remove --purge name</span><br></pre></td></tr></table></figure>
-一般来说，这样的卸载会比较干净地卸载掉软件。有些没有办法自动删除的文件，可以手动去删除掉</li>
-</ul>
-<h2 id="4-另一种deb包安装方式"><a href="#4-另一种deb包安装方式" class="headerlink" title="4. 另一种deb包安装方式"></a>4. 另一种deb包安装方式</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># cd到安装包目录</span></span><br><span class="line">sudo apt install ./xxxx.deb</span><br></pre></td></tr></table></figure>
-<h2 id="5-安装filename-tar-gz软件"><a href="#5-安装filename-tar-gz软件" class="headerlink" title="5. 安装filename.tar.gz软件"></a>5. 安装filename.tar.gz软件</h2><ul>
-<li>解压</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tar -xzvf file.tar.gz</span><br></pre></td></tr></table></figure>
-<ul>
-<li>然后在解压目录或者bin文件夹中执行setup.sh文件。。。这个一般不定，安装前最好查一下官网说明</li>
-</ul>
-<h2 id="6-源码安装"><a href="#6-源码安装" class="headerlink" title="6. 源码安装"></a>6. 源码安装</h2><p>有些软件没有被收录进软件镜像源，或者说开发者需要去使用他们最新的版本，这时候就要自己去他们的官网或者是代码托管平台下载最新的Linux源码，自己来build。</p>
-<p>这种方式安装需<strong>要解决很多的依赖</strong>。。。。安装前，多问问度娘，Google</p>
-<p>此处还是以tree为例：</p>
-<ul>
-<li>先去 <a href="http://link.zhihu.com/?target=ftp%3A//mama.indstate.edu/linux/tree/" title="Tree FTP">Tree FTP</a> 下载最新的源码包</li>
-<li>解压</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tar zxf tree-1.7.0.tgz</span><br><span class="line"><span class="built_in">cd</span>  tree-1.7.0/</span><br><span class="line">make and install</span><br><span class="line">sudo make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
-<p><strong>如果没有配置g++环境，先用apt安装build-essential</strong></p>
-<ul>
-<li>OK, 大功告成<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nutao@master:~/Public/tree-1.7.0$ tree</span><br><span class="line">.</span><br><span class="line">├── CHANGES</span><br><span class="line">├── color.c</span><br><span class="line">├── color.o</span><br><span class="line">├── doc</span><br><span class="line">│   ├── tree.1</span><br><span class="line">│   ├── tree.1.fr</span><br><span class="line">│   └── xml.dtd</span><br><span class="line">├── hash.c</span><br><span class="line">├── hash.o</span><br><span class="line">├── html.c</span><br><span class="line">├── html.o</span><br><span class="line">├── INSTALL</span><br><span class="line">├── json.c</span><br><span class="line">├── json.o</span><br><span class="line">├── LICENSE</span><br><span class="line">├── Makefile</span><br><span class="line">├── README</span><br><span class="line">├── strverscmp.c</span><br><span class="line">├── TODO</span><br><span class="line">├── tree</span><br><span class="line">├── tree.c</span><br><span class="line">├── tree.h</span><br><span class="line">├── tree.o</span><br><span class="line">├── unix.c</span><br><span class="line">├── unix.o</span><br><span class="line">├── xml.c</span><br><span class="line">└── xml.o</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h2 id="常用压缩文件的解压命令"><a href="#常用压缩文件的解压命令" class="headerlink" title="常用压缩文件的解压命令"></a>常用压缩文件的解压命令</h2><p>1、<em>.tar 用 tar –xvf 解压<br>2、</em>.gz 用 gzip -d或者gunzip 解压<br>3、.tar.gz和.tgz 用 tar –xzf 解压<br>4、<em>.bz2 用 bzip2 -d或者用bunzip2 解压<br>5、</em>.tar.bz2用tar –xjf 解压<br>6、<em>.Z 用 uncompress 解压<br>7、</em>.tar.Z 用tar –xZf 解压<br>8、<em>.rar 用 unrar e解压<br>9、</em>.zip 用 unzip 解压</p>
-]]></content>
-      <categories>
-        <category>Ubuntu</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>Ubuntu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Ubuntu16.04 Grub Rescue</title>
-    <url>/2017/07/13/Ubuntu16-04-Grub-Rescue/</url>
-    <content><![CDATA[<p>如果某一天, 你不小心扩展了一下你的 / 目录, 又忘记了更新 grub 引导. 不好意思, 你有麻烦了</p>
-<p><img src="/images/1.png" alt="grub"></p>
-<h3 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h3><!-- more  -->
-<h4 id="1-ls-一下所有的盘符"><a href="#1-ls-一下所有的盘符" class="headerlink" title="1. ls 一下所有的盘符"></a>1. ls 一下所有的盘符</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">grub rescue&gt; ls</span><br></pre></td></tr></table></figure>
-<h4 id="2-找-boot-grub的分区"><a href="#2-找-boot-grub的分区" class="headerlink" title="2. 找/boot/grub的分区"></a>2. 找/boot/grub的分区</h4><blockquote>
-<p>如果你的 /boot 没有单独分区, 请执行</p>
-</blockquote>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">grub rescue&gt; ls (hd0,msdosx)/boot/grub</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>如果你的 /boot 单独分区啦, 请执行</p>
-</blockquote>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">grub rescue&gt; ls (hd0,msdosx)/grub</span><br></pre></td></tr></table></figure>
-
-<p>ls出如下的目录, 恭喜你找到 /boot 路径了</p>
-<h4 id="3-修复grub引导"><a href="#3-修复grub引导" class="headerlink" title="3. 修复grub引导"></a>3. 修复grub引导</h4><blockquote>
-<p>假设/boot 在(hd0,msdos3) 中</p>
-</blockquote>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># /boot 单独分区</span><br><span class="line">set root=(hd0,msdos3)</span><br><span class="line">set prefix=(hd0,msdos3)/grub</span><br><span class="line">insmod normal</span><br><span class="line">normal</span><br></pre></td></tr></table></figure>
-
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># /boot 没有单独分区</span><br><span class="line">set root=(hd0,msdos3)</span><br><span class="line">set prefix=(hd0,msdos3)/boot/grub</span><br><span class="line">insmod normal</span><br><span class="line">normal</span><br></pre></td></tr></table></figure>
-<p>正常情况下, 执行完后, 电脑就能开机进入桌面啦<br>然后, 还没有结束. (这时千万不要关机, 否则前面步骤再来一次)<br><strong>在正常进入系统以后…</strong></p>
-<h4 id="4-更新系统-grub-引导"><a href="#4-更新系统-grub-引导" class="headerlink" title="4. 更新系统 grub 引导"></a>4. 更新系统 grub 引导</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo update-grub</span><br><span class="line">sudo update-grub2</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>打印出如下日志(我是双系统)</p>
-</blockquote>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Generating grub configuration file ...</span><br><span class="line">Found linux image: /boot/vmlinuz-4.4.0-66-generic</span><br><span class="line">Found initrd image: /boot/initrd.img-4.4.0-66-generic</span><br><span class="line">Found memtest86+ image: /memtest86+.elf</span><br><span class="line">Found memtest86+ image: /memtest86+.bin</span><br><span class="line">Found Windows 10 (loader) on /dev/sda1</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>然后重新安装grub</p>
-</blockquote>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">nutao@nutao-HP:~$ sudo grub-install /dev/sda</span><br><span class="line"># 日志</span><br><span class="line">Installing for i386-pc platform.</span><br><span class="line">Installation finished. No error reported.</span><br></pre></td></tr></table></figure>
-
-<h4 id="OK-一切搞定"><a href="#OK-一切搞定" class="headerlink" title="OK, 一切搞定"></a>OK, 一切搞定</h4>]]></content>
-      <categories>
-        <category>Ubuntu</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>Ubuntu</tag>
       </tags>
   </entry>
   <entry>
@@ -1346,6 +1346,67 @@
       </tags>
   </entry>
   <entry>
+    <title>git submodule入坑指南</title>
+    <url>/2020/11/25/git-submodule%E5%85%A5%E5%9D%91%E6%8C%87%E5%8D%97/</url>
+    <content><![CDATA[<p>在工程管理实践中，Git submodule可以将多个git仓库以模块的形式集中于主库，方便及时跟进各个库的更改。下面以我的博客为例。</p>
+<span id="more"></span>
+
+<h1 id="1-添加gitsubmodule"><a href="#1-添加gitsubmodule" class="headerlink" title="1. 添加gitsubmodule"></a>1. 添加gitsubmodule</h1><p>为了方便对hexo主题的管理和及时更新，我需要引入gitsubmodule对hexo-theme-next主题进行管理。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">添加gitsubmodule</span></span><br><span class="line">git submodule add https://gitee.com/nutao/hexo-theme-next.git themes/next </span><br></pre></td></tr></table></figure>
+
+<p>上述命令会在目录<code>themes/next</code>中clone hexo-theme-next.git。并且，会在当前目录中生成文件<code>.gitsubmodule</code>.</p>
+<figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="section">[submodule &quot;themes/next&quot;]</span></span><br><span class="line">  <span class="attr">path</span> = themes/next</span><br><span class="line">  <span class="attr">url</span> = https://gitee.com/nutao/hexo-theme-next.git</span><br><span class="line">  <span class="attr">branch</span> = master</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-更新gitsubmodule"><a href="#2-更新gitsubmodule" class="headerlink" title="2. 更新gitsubmodule"></a>2. 更新gitsubmodule</h1><p>对配置文件<code>.gitsubmodule</code>手动更改（比如branch）后，需要对配置的更改刷新到 <code>.git/config</code>.</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">git submodule sync</span><br></pre></td></tr></table></figure>
+
+<p>当然，git submodule有命令可以做相关的配置更改，但是改配置文件更快捷。</p>
+<h1 id="3-删除gitsubmodule"><a href="#3-删除gitsubmodule" class="headerlink" title="3. 删除gitsubmodule"></a>3. 删除gitsubmodule</h1><blockquote>
+<p>第一步：删除<code>.git/config</code>中对submodule的配置</p>
+</blockquote>
+<ul>
+<li>正常情况下(<strong>推荐</strong>)</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git submodule deinit themes/next</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>异常情况下</p>
+<p>直接更改文件<code>.git/config</code>中对submodule的配置</p>
+</li>
+</ul>
+<blockquote>
+<p>第二步：清除git缓存</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git rm --cached themes/next</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>第三步：删除<code>.gitsubmodule</code>中对该submodule的配置</p>
+</blockquote>
+<h1 id="4-submodule初始化"><a href="#4-submodule初始化" class="headerlink" title="4. submodule初始化"></a>4. submodule初始化</h1><p>从仓库拉取到项目后，submodule相关的目录一般是空的，如果需要拉取应先执行如下命令：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">git submodule update --init --remote</span><br></pre></td></tr></table></figure>
+
+<h1 id="5-其他命令"><a href="#5-其他命令" class="headerlink" title="5. 其他命令"></a>5. 其他命令</h1><ul>
+<li><p>对子模块批量执行某项git操作</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">git submodule foreach &lt;command&gt;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">example</span></span><br><span class="line">git submodule foreach git checkout master</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果存在嵌套的子模块，应加上 <code>--revursive</code> 参数</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">git submodule update --init --recursive</span><br><span class="line">git submodule sync --recursive</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>git</category>
+      </categories>
+      <tags>
+        <tag>git</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>数据库测试神器==&gt;YCSB</title>
     <url>/2017/11/30/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%B5%8B%E8%AF%95%E7%A5%9E%E5%99%A8-YCSB/</url>
     <content><![CDATA[<h2 id="简单介绍"><a href="#简单介绍" class="headerlink" title="简单介绍"></a>简单介绍</h2><p>YCSB, 英文全称：Yahoo! Cloud Serving Benchmark (YCSB) 。是 Yahoo 公司的一个用来对云服务进行基础测试的工具, 目标是促进新一代云数据服务系统的性能比较。由于它集成了大多数常用的数据库的测试代码，所以，它也是数据库测试的一大利器.</p>
@@ -1461,67 +1522,6 @@
       <tags>
         <tag>Linux</tag>
         <tag>Ubuntu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>git submodule入坑指南</title>
-    <url>/2020/11/25/git-submodule%E5%85%A5%E5%9D%91%E6%8C%87%E5%8D%97/</url>
-    <content><![CDATA[<p>在工程管理实践中，Git submodule可以将多个git仓库以模块的形式集中于主库，方便及时跟进各个库的更改。下面以我的博客为例。</p>
-<span id="more"></span>
-
-<h1 id="1-添加gitsubmodule"><a href="#1-添加gitsubmodule" class="headerlink" title="1. 添加gitsubmodule"></a>1. 添加gitsubmodule</h1><p>为了方便对hexo主题的管理和及时更新，我需要引入gitsubmodule对hexo-theme-next主题进行管理。</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">添加gitsubmodule</span></span><br><span class="line">git submodule add https://gitee.com/nutao/hexo-theme-next.git themes/next </span><br></pre></td></tr></table></figure>
-
-<p>上述命令会在目录<code>themes/next</code>中clone hexo-theme-next.git。并且，会在当前目录中生成文件<code>.gitsubmodule</code>.</p>
-<figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="section">[submodule &quot;themes/next&quot;]</span></span><br><span class="line">  <span class="attr">path</span> = themes/next</span><br><span class="line">  <span class="attr">url</span> = https://gitee.com/nutao/hexo-theme-next.git</span><br><span class="line">  <span class="attr">branch</span> = master</span><br></pre></td></tr></table></figure>
-
-<h1 id="2-更新gitsubmodule"><a href="#2-更新gitsubmodule" class="headerlink" title="2. 更新gitsubmodule"></a>2. 更新gitsubmodule</h1><p>对配置文件<code>.gitsubmodule</code>手动更改（比如branch）后，需要对配置的更改刷新到 <code>.git/config</code>.</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">git submodule sync</span><br></pre></td></tr></table></figure>
-
-<p>当然，git submodule有命令可以做相关的配置更改，但是改配置文件更快捷。</p>
-<h1 id="3-删除gitsubmodule"><a href="#3-删除gitsubmodule" class="headerlink" title="3. 删除gitsubmodule"></a>3. 删除gitsubmodule</h1><blockquote>
-<p>第一步：删除<code>.git/config</code>中对submodule的配置</p>
-</blockquote>
-<ul>
-<li>正常情况下(<strong>推荐</strong>)</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git submodule deinit themes/next</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>异常情况下</p>
-<p>直接更改文件<code>.git/config</code>中对submodule的配置</p>
-</li>
-</ul>
-<blockquote>
-<p>第二步：清除git缓存</p>
-</blockquote>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git rm --cached themes/next</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>第三步：删除<code>.gitsubmodule</code>中对该submodule的配置</p>
-</blockquote>
-<h1 id="4-submodule初始化"><a href="#4-submodule初始化" class="headerlink" title="4. submodule初始化"></a>4. submodule初始化</h1><p>从仓库拉取到项目后，submodule相关的目录一般是空的，如果需要拉取应先执行如下命令：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">git submodule update --init --remote</span><br></pre></td></tr></table></figure>
-
-<h1 id="5-其他命令"><a href="#5-其他命令" class="headerlink" title="5. 其他命令"></a>5. 其他命令</h1><ul>
-<li><p>对子模块批量执行某项git操作</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">git submodule foreach &lt;command&gt;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">example</span></span><br><span class="line">git submodule foreach git checkout master</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>如果存在嵌套的子模块，应加上 <code>--revursive</code> 参数</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">git submodule update --init --recursive</span><br><span class="line">git submodule sync --recursive</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>git</category>
-      </categories>
-      <tags>
-        <tag>git</tag>
       </tags>
   </entry>
   <entry>
