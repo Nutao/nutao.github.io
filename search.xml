@@ -116,6 +116,102 @@
       </tags>
   </entry>
   <entry>
+    <title>Docker入门三：使用Mount Cache加速CI</title>
+    <url>/2023/07/11/Docker%E5%85%A5%E9%97%A8%E4%B8%89/</url>
+    <content><![CDATA[<p>接上一篇文章，本文将介绍如何使用挂载缓存（Mount Cache）<strong>加速应用的编译</strong>。经验证，相比直接编译，使用挂载缓存的方案可以节约135%的时间成本。</p>
+<span id="more"></span>
+
+<h2 id="一、为什么需要对编译过程加速"><a href="#一、为什么需要对编译过程加速" class="headerlink" title="一、为什么需要对编译过程加速"></a>一、为什么需要对编译过程加速</h2><p>使用各种编程语言，都绕不开依赖管理。比如：</p>
+<ul>
+<li>Java/Maven</li>
+<li>Python/pip</li>
+<li>Golang/gomod</li>
+<li>JavaScript/npm</li>
+<li>C++/conan</li>
+</ul>
+<p>。。。</p>
+<p><img src="/2023/07/11/Docker%E5%85%A5%E9%97%A8%E4%B8%89/1.png" alt="image-20230711094153656"></p>
+<p>通过docker编译应用时，可能会出现某个项目需要拉取<strong>数十个甚至上百个依赖</strong>。即便在公司内搭建有对应的制品仓库，大量的依赖拉取请求，也可能会造成如下问题：</p>
+<ul>
+<li>制品仓库请求负载较大</li>
+<li>CI耗时较长，阻塞部署效率</li>
+<li>编译消耗较多的CPU和网络文件句柄，进一步加剧CI编译耗时或者导致部分编译容器崩溃。</li>
+<li>每个编译都拉取并存依赖，高峰时段，可能宿主机磁盘很快就被占满导致部分CI容器报错等。</li>
+</ul>
+<h2 id="二、有哪些思路可以解决上述问题"><a href="#二、有哪些思路可以解决上述问题" class="headerlink" title="二、有哪些思路可以解决上述问题"></a>二、有哪些思路可以解决上述问题</h2><p>解决依赖缓存的问题，有几个思路可以参考：</p>
+<ol>
+<li>通过工具的特性来缓存依赖。如Docker的Mount&amp;Bind宿主机目录，Jenkins的打包插件缓存至宿主机目录等。</li>
+<li>通过网络文件系统或者网络块设备共享。如将NFS挂载至Docker目录中，或者把NFS目录挂载在Jenkins的编译机上。</li>
+<li>通过卷屏蔽块设备或者文件系统差异。如将使用K8S的管理的Jenkins集群，可以创建PV，并将其挂载至CI容器依赖缓存的目录。使用Docker的Volume关联NFS，然后挂载至CI容器的依赖缓存目录等。</li>
+</ol>
+<p>后两种方案其实是在第一种方案上叠buff，方便外挂文件系统的分发或管理。归根结底，还是利用容器中可以外挂文件或目录的特性实现。</p>
+<h2 id="三、解决方案说明（以Docker为例）"><a href="#三、解决方案说明（以Docker为例）" class="headerlink" title="三、解决方案说明（以Docker为例）"></a>三、解决方案说明（以Docker为例）</h2><h3 id="3-1-需要了解的背景"><a href="#3-1-需要了解的背景" class="headerlink" title="3.1 需要了解的背景"></a>3.1 需要了解的背景</h3><p>使用Docker入门二中的golang-demo工程。需要提前了解的是：</p>
+<ul>
+<li>golang使用gomod管理依赖</li>
+<li>通常依赖下载路径位于：<code>$&#123;GOPATH&#125;/pkg/mod</code></li>
+<li>${GOPATH} 通常为 <code>/go</code></li>
+</ul>
+<h3 id="3-2-方案说明（使用Bind-amp-Mount）"><a href="#3-2-方案说明（使用Bind-amp-Mount）" class="headerlink" title="3.2 方案说明（使用Bind&amp;Mount）"></a>3.2 方案说明（使用Bind&amp;Mount）</h3><p>众所周知，docker提供 <strong>-v|–volume</strong> 命令，将宿主机目录挂载至容器目录。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">-v|--volume [=[[HOST-DIR:]CONTAINER-DIR[:OPTIONS]]]</span><br><span class="line">  Create a bind mount. If you specify, -v /HOST-DIR:/CONTAINER-DIR, Docker</span><br><span class="line">  bind mounts /HOST-DIR in the host to /CONTAINER-DIR in the Docker</span><br><span class="line">  container. If &#x27;HOST-DIR&#x27; is omitted,  Docker automatically creates the new</span><br><span class="line">  volume on the host.  The OPTIONS are a comma delimited list and can be:</span><br><span class="line"></span><br><span class="line">      • [rw|ro]</span><br><span class="line"></span><br><span class="line">      • [z|Z]</span><br><span class="line"></span><br><span class="line">      • [[r]shared|[r]slave|[r]private]</span><br><span class="line"></span><br><span class="line">      • [delegated|cached|consistent]</span><br><span class="line"></span><br><span class="line">      • [nocopy]</span><br></pre></td></tr></table></figure>
+
+<p>回到需求，我们的目标是<strong>缓存依赖，加速CI编译</strong>。如果将宿主机的某个目录直接挂载至容器内，作为依赖的缓存路径，后续其他CI容器挂载此目录，就能直接使用这个目录的依赖缓存。</p>
+<p><img src="/2023/07/11/Docker%E5%85%A5%E9%97%A8%E4%B8%89/2.png" alt="image-20230711095635977"></p>
+<h3 id="3-3-改造"><a href="#3-3-改造" class="headerlink" title="3.3 改造"></a>3.3 改造</h3><p>为了验证上述方案的实际提示效率。我对工程：<a href="https://github.com/Nutao/golang-demo.git">https://github.com/Nutao/golang-demo.git</a> 的编译打包程做了优化。比如，将Client和Server的Dockerfile做了拆分。</p>
+<ul>
+<li>Dockerfile.Client</li>
+</ul>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">FROM</span> scratch</span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> ./bin/client /bin/</span></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="language-bash"> [ <span class="string">&quot;/bin/client&quot;</span> ]</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Dockerfile.Server</li>
+</ul>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">FROM</span> scratch</span><br><span class="line"></span><br><span class="line"><span class="keyword">COPy</span><span class="language-bash">  ./bin/server /bin/</span></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="language-bash"> [ <span class="string">&quot;/bin/server&quot;</span> ]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-4-测试脚本准备"><a href="#3-4-测试脚本准备" class="headerlink" title="3.4 测试脚本准备"></a>3.4 测试脚本准备</h3><p>，在执行每一条测试验证前，删除docker的镜像layer缓存</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker builder prune -af</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ID                                              RECLAIMABLE     SIZE            LAST ACCESSED</span><br><span class="line">syz9faj06goghpxmpjqh4mie8*                      true            76.42MB         18 hours ago</span><br><span class="line">0lps8qdsgia4i7fj5q7r3el62*                      true    503B            5 minutes ago</span><br><span class="line">shj7sncxajdpcogxu1f9xb188*                      true    61.52kB         5 minutes ago</span><br><span class="line">ijq08g8qy0d8hvuj7jmrjy2s1                       true    0B              18 hours ago</span><br><span class="line">f8wwg6uonysx1dh5ytiusuk0n                       true    7.903MB         5 minutes ago</span><br><span class="line">0iviep32sb3mllalm52w3rv34*                      true    0B              5 minutes ago</span><br><span class="line">xhurqymfiw81qbvfoq7908eme                       true    7.972MB         5 minutes ago</span><br><span class="line">1w3cd4cw3wky5hp2p9yx461b2                       true    62.68MB         Less than a second ago</span><br><span class="line">rkwtau92e718nrgie7mno6wvn                       true    34B             Less than a second ago</span><br><span class="line">kwaxq4720nnic2gitsbfmt0xu                       true    61.52kB         Less than a second ago</span><br><span class="line">tzyyosfpjrimqghq20uvm3v83                       true    0B              Less than a second ago</span><br><span class="line">g1kcf6fwjvx3vhxr0vej3cnqg                       true    0B              Less than a second ago</span><br><span class="line">w6v5b5162h4mudtzyrpqeszep                       true    0B              Less than a second ago</span><br><span class="line">wi0piywmrl0gmy0g9go3ivfyb                       true    0B              Less than a second ago</span><br><span class="line">phkwfyw58t2jkyb65pxe31olt                       true    0B              Less than a second ago</span><br><span class="line">Total:  155.1MB</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>新增  test_1.sh  脚本用于合并多级构建中两个target镜像的编译流程。</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">/bin/bash</span></span><br><span class="line">set -ex</span><br><span class="line">docker build --tag=server:v1  --target=server --progress=plain -f Dockerfile.5  .</span><br><span class="line">docker build --tag=client:v1  --target=client --progress=plain -f Dockerfile.5  .</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>新增build.sh 脚本用于合并挂载目录方案下的镜像编译流程。</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">/bin/bash</span></span><br><span class="line">set -ex</span><br><span class="line"></span><br><span class="line">docker run --rm --name golang-build   -v .:/src  -v ./pkg:/go/pkg/mod  golang:1.20-alpine sh -c &quot;cd /src &amp;&amp; sh build_in.sh&quot;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">实际的CI可以运行DinD镜像执行build和push流程</span></span><br><span class="line">docker build -t  client:v2  -f Dockerfile.Client  .</span><br><span class="line">docker build -t  server:v2  -f Dockerfile.Server  .</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-5-测试结果"><a href="#3-5-测试结果" class="headerlink" title="3.5 测试结果"></a>3.5 测试结果</h3><ul>
+<li>分target build流程所需时间（real    0m27.654s）</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">nutao@Nutao-PC:~/workspace/go_project/buildme$ time sh test.sh </span><br><span class="line"></span><br><span class="line">+ docker build --tag=server:v1 --target=server --progress=plain -f Dockerfile.5 .</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">1 [internal] load build definition from Dockerfile.5</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">1 transferring dockerfile: 628B <span class="keyword">done</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">2 [internal] load .dockerignore</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">2 transferring context: 2B <span class="keyword">done</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">3 resolve image config <span class="keyword">for</span> docker.io/docker/dockerfile:1</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">3 DONE 4.1s</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">4 docker-image://docker.io/docker/dockerfile:1@sha256:39b85bbfa7536a5feceb7372a0817649ecb2724562a38360f4d6a7782a409b14</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">4 resolve docker.io/docker/dockerfile:1@sha256:39b85bbfa7536a5feceb7372a0817649ecb2724562a38360f4d6a7782a409b14 0.0s <span class="keyword">done</span></span></span><br><span class="line">...</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">13 writing image sha256:7718d17674422d9e3dc620bb6cab61e3e9920a5b38694196f32ae6791be78813 <span class="keyword">done</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">13 naming to docker.io/library/server:v1 <span class="keyword">done</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">13 DONE 0.1s</span></span><br><span class="line">+ docker build --tag=client:v1 --target=client --progress=plain -f Dockerfile.5 .</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">1 [internal] load .dockerignore</span></span><br><span class="line">...</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">13 writing image sha256:c04ec920bb0bffd7b65ec20cb252ee6ae639d46696db7167117977816de45207 <span class="keyword">done</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">13 naming to docker.io/library/client:v1 <span class="keyword">done</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">13 DONE 0.1s</span></span><br><span class="line"></span><br><span class="line">real    0m27.654s</span><br><span class="line">user    0m1.202s</span><br><span class="line">sys     0m1.173s</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>挂宿主机磁盘编译（real    0m11.812s）</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">nutao@Nutao-PC:~/workspace/go_project/buildme$ time ./build.sh</span><br><span class="line"></span><br><span class="line">+ docker run --rm --name golang-build -v .:/src -v ./pkg:/go/pkg/mod golang:1.20-alpine sh -c cd /src &amp;&amp; sh build_in.sh</span><br><span class="line">+ go env -w &#x27;GOPROXY=https://goproxy.cn,direct&#x27;</span><br><span class="line">+ go mod download -x</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">get https://goproxy.cn/github.com/charmbracelet/bubbletea/@v/v0.23.1.mod</span></span><br><span class="line">....</span><br><span class="line">[+] Building 0.2s (5/5) FINISHED                                                                                                                                      </span><br><span class="line"> =&gt; [internal] load .dockerignore                                                                     0.0s</span><br><span class="line">....</span><br><span class="line"> =&gt; =&gt; exporting layers                                                                               0.1s</span><br><span class="line"> =&gt; =&gt; writing image sha256:bd811041d8204ca1c2752d6ec5f1f3231f2404f69810d783510a7e336ddba664          0.0s</span><br><span class="line"> =&gt; =&gt; naming to docker.io/library/client:v2                                                          0.0s</span><br><span class="line">+ docker build -t server:v2 -f Dockerfile.Server .</span><br><span class="line">[+] Building 0.1s (5/5) FINISHED                                                                           </span><br><span class="line"> =&gt; [internal] load .dockerignore                                                                     0.0s</span><br><span class="line"> =&gt; =&gt; transferring context: 2B                                                                       0.0s</span><br><span class="line"> =&gt; [internal] load build definition from Dockerfile.Server                                           0.0s</span><br><span class="line"> =&gt; =&gt; transferring dockerfile: 111B                                                                  0.0s</span><br><span class="line"> =&gt; [internal] load build context                                                                     0.1s</span><br><span class="line"> =&gt; =&gt; transferring context: 7.91MB                                                                   0.0s</span><br><span class="line"> =&gt; [1/1] COPY  ./bin/server /bin/                                                                    0.0s</span><br><span class="line"> =&gt; exporting to image                                                                                0.1s</span><br><span class="line"> =&gt; =&gt; exporting layers                                                                               0.0s</span><br><span class="line"> =&gt; =&gt; writing image sha256:800636e0771057709d0e0c488ae54c4e0723b38693c47e65586065852a47a040          0.0s</span><br><span class="line"> =&gt; =&gt; naming to docker.io/library/server:v2                                                          0.0s</span><br><span class="line"></span><br><span class="line">real    0m11.812s</span><br><span class="line">user    0m0.377s</span><br><span class="line">sys     0m0.216s</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="四、结论"><a href="#四、结论" class="headerlink" title="四、结论"></a>四、结论</h2><p>经过demo验证：</p>
+<ul>
+<li>分Target分级构建，编译俩golang镜像，耗时约 27.7 s</li>
+<li>使用docker Bind&amp;Mount提供的特性，编译俩golang镜像，耗时约11.8 s</li>
+</ul>
+<p><img src="/2023/07/11/Docker%E5%85%A5%E9%97%A8%E4%B8%89/3.png" alt="image-20230711114259937"></p>
+<p>但是，挂盘缓存后，后续该项目所有的CI流程都可以使用依赖缓存，节约的时间成本会远大于此。</p>
+<p>当然，在正式的企业环境内，涉及到磁盘管理的成本可以选择使用NFS、NBD、Ceph等网络磁盘，方便管理和扩容。</p>
+]]></content>
+      <categories>
+        <category>Docker</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>GIT开发流程梳理</title>
     <url>/2023/02/08/GIT%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86/</url>
     <content><![CDATA[<h1 id="1-目的"><a href="#1-目的" class="headerlink" title="1. 目的"></a>1. 目的</h1><p>为了有效的帮助团队更简洁，更统一的管理好源码。</p>
@@ -794,160 +890,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Ubuntu 分区（目录）挂载/扩容</title>
-    <url>/2017/07/17/Ubuntu-%E5%88%86%E5%8C%BA%EF%BC%88%E7%9B%AE%E5%BD%95%EF%BC%89%E6%8C%82%E8%BD%BD-%E6%89%A9%E5%AE%B9/</url>
-    <content><![CDATA[<p>这次写的教程是经过我多次验证，用于对Ubuntu分区（目录）操作的一些经验。分享给大家，希望能够有所帮助。</p>
-<p><strong>友善提醒：硬盘操作有风险，请注意备份自己的重要资料。如果不熟练，请在虚拟机上自己多操作几次，再在Server上面操作</strong></p>
-<span id="more"></span>
-
-<h2 id="1-为啥会被分区容量所困扰？"><a href="#1-为啥会被分区容量所困扰？" class="headerlink" title="1.为啥会被分区容量所困扰？"></a>1.为啥会被分区容量所困扰？</h2><p>通常情况下，我们在使用Ubuntu还是没啥大毛病。可是有一天，突然在解开锁屏的时候，突然弹出如下警告。。。</p>
-<p><img src="https://pic3.zhimg.com/v2-88408a07f66d85e07a333c6e22c881ea_b.png" alt="磁盘空间不足提示"></p>
-<p>系统磁盘容量不足！！！这个时候就有点烦心了。左思右想，有如下几种应急方法（欢迎添加）</p>
-<ul>
-<li>先去删一波 /tmp, /var/cache/apt/archives下面的临时文件， 删掉不用的软件和遗留的目录、日志</li>
-<li>autoremove, autoclean 删掉多余的 lib</li>
-<li>删掉/home下面多余的文档</li>
-<li>添加新的硬盘<br>前三种方法都是暂时性的应急，不是长久之计。而且，当你的硬盘里面存了大量的重要的资料的时候（譬如用户的数据，重要的数据文件等），这个时候就不得不采用第四种方案了。</li>
-</ul>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><blockquote>
-<p>将新的硬盘挂载到需要添加存储介质的目录下（根据实际需要）</p>
-</blockquote>
-<h2 id="1-查看磁盘信息"><a href="#1-查看磁盘信息" class="headerlink" title="1. 查看磁盘信息"></a>1. 查看磁盘信息</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo fdisk -l</span><br></pre></td></tr></table></figure>
-<p><img src="/2017/07/17/Ubuntu-%E5%88%86%E5%8C%BA%EF%BC%88%E7%9B%AE%E5%BD%95%EF%BC%89%E6%8C%82%E8%BD%BD-%E6%89%A9%E5%AE%B9/1.png" alt="磁盘信息"></p>
-<p>作为测试，我选取 /dev/sda5, 想要将其挂载到 /home/nutao/disk/D 下面</p>
-<p>查看硬盘使用情况用如下命令：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">df</span> -kh</span><br></pre></td></tr></table></figure>
-<h2 id="2-查看硬盘-UUID-和-磁盘类型"><a href="#2-查看硬盘-UUID-和-磁盘类型" class="headerlink" title="2. 查看硬盘 UUID 和 磁盘类型"></a>2. 查看硬盘 UUID 和 磁盘类型</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo blkid</span><br></pre></td></tr></table></figure>
-<p><img src="/2017/07/17/Ubuntu-%E5%88%86%E5%8C%BA%EF%BC%88%E7%9B%AE%E5%BD%95%EF%BC%89%E6%8C%82%E8%BD%BD-%E6%89%A9%E5%AE%B9/2.png" alt="UUID"></p>
-<p>用记事本或者其他工具记录下 /dev/sda5 的UUID和分区格式（建议将新的硬盘分区为ext4）</p>
-<h2 id="3-取消挂载目标盘"><a href="#3-取消挂载目标盘" class="headerlink" title="3. 取消挂载目标盘"></a>3. 取消挂载目标盘</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo umount /dev/sda5</span><br></pre></td></tr></table></figure>
-<h2 id="4-编辑-etc-fstab-文件"><a href="#4-编辑-etc-fstab-文件" class="headerlink" title="4. 编辑 /etc/fstab 文件"></a>4. 编辑 /etc/fstab 文件</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo vi /etc/fstab</span><br></pre></td></tr></table></figure>
-<p>追加一行内容</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">UUID=0008DCD1000EA709 /home/nutao/disk/D    ntfs    defaults    0   2</span><br></pre></td></tr></table></figure>
-<p>其中第一列为UUID, 第二列为挂载目录（该目录必须为空目录），第三列为文件系统类型，第四列为参数，第五列0表示不备份，最后一列必须为２或0(除非引导分区为1)</p>
-<h2 id="5-更新引导（千万记得更新，否则重启会出错）"><a href="#5-更新引导（千万记得更新，否则重启会出错）" class="headerlink" title="5. 更新引导（千万记得更新，否则重启会出错）"></a>5. 更新引导（千万记得更新，否则重启会出错）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo update-grub</span><br><span class="line">sudo update-grub2</span><br></pre></td></tr></table></figure>
-<hr>
-<h2 id="Linux下分区工具-gparted"><a href="#Linux下分区工具-gparted" class="headerlink" title="Linux下分区工具 gparted"></a>Linux下分区工具 gparted</h2><p>安装命令</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Debian</span></span><br><span class="line">sudo apt-get install gparted</span><br><span class="line"></span><br><span class="line"><span class="comment"># Fedora</span></span><br><span class="line">su -c <span class="string">&quot;yum install gparted&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># OpenSUSE</span></span><br><span class="line">sudo zypper install gparted</span><br><span class="line"></span><br><span class="line"><span class="comment"># Ubuntu</span></span><br><span class="line">sudo apt-get install gparted</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>Ubuntu</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>Ubuntu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Ubuntu 换源，安装&amp;卸载软件</title>
-    <url>/2017/07/17/Ubuntu-%E6%8D%A2%E6%BA%90%EF%BC%8C%E5%AE%89%E8%A3%85-%E5%8D%B8%E8%BD%BD%E8%BD%AF%E4%BB%B6/</url>
-    <content><![CDATA[<p>国内的筒子们，经常发现在update的时候各种卡。。。有时候心情好，等等也就罢了。万一某一天急着安装软件，那种状态下，真的是多等一秒感觉都是心烦气躁的。所以，本文就来跟大家聊聊在Ubuntu 中换源，安装&amp;卸载软件的那些事，欢迎各位一起交流。。。<br><img src="/images/ubuntu16.04.png" alt="Ubuntu16.04"></p>
-<span id="more"></span>
-<h2 id="1-查找国内的开源镜像提供的源地址"><a href="#1-查找国内的开源镜像提供的源地址" class="headerlink" title="1. 查找国内的开源镜像提供的源地址"></a>1. 查找国内的开源镜像提供的源地址</h2><blockquote>
-<p>Ubuntu的源的list文件位于 <code>/etc/apt/sources.list</code></p>
-</blockquote>
-<ul>
-<li>高校镜像源（国内其他大学也有提供，可自行查找）<br><a href="http://link.zhihu.com/?target=https%3A//mirrors.tuna.tsinghua.edu.cn/help/ubuntu/" title="清华大学开源镜像站">清华大学开源镜像站 </a><br><a href="http://link.zhihu.com/?target=https%3A//mirrors.ustc.edu.cn/repogen/" title="中科大开源镜像站">中科大开源镜像站</a></li>
-</ul>
-<ul>
-<li>企业镜像源（其他企业的请自行查找）<br><a href="http://link.zhihu.com/?target=http%3A//mirrors.aliyun.com/help/ubuntu" title="阿里云开源镜像站">阿里云开源镜像站 </a><br><a href="http://link.zhihu.com/?target=http%3A//mirrors.163.com/.help/ubuntu.html" title="网易开源镜像站">网易开源镜像站</a></li>
-</ul>
-<p><strong>这里以清华源为例</strong></p>
-<p>先去查一下清华源的帮助文档，戳 <a href="http://link.zhihu.com/?target=https%3A//mirrors.tuna.tsinghua.edu.cn/help/ubuntu/" title="清华大学开源镜像站">清华大学开源镜像站 </a>，选择相匹配的Ubuntu的版本，会得到软件源镜像的地址。</p>
-<p>接下来直接替换一下系统的source.list文件<del>~</del></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 备份一下</span></span><br><span class="line">sudo <span class="built_in">cp</span> /etc/apt/sources.list /etc/apt/sources.list.bak</span><br><span class="line"><span class="comment"># 修改</span></span><br><span class="line">sudo vi /etc/apt/sources.list</span><br></pre></td></tr></table></figure>
-<p>将文档里面所有的内容删除，然后替换为清华镜像提供的软件源镜像的地址。<br>例如我用的 16.04 版， 替换为：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted universe multiverse</span></span><br></pre></td></tr></table></figure>
-<p>然后再update一下，你会发现速度还是有明显的提升的。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt update</span><br></pre></td></tr></table></figure>
-<h2 id="2-使用apt安装软件"><a href="#2-使用apt安装软件" class="headerlink" title="2. 使用apt安装软件"></a>2. 使用apt安装软件</h2><p>这个就不多说了，比较简单，譬如安装tree</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt install tree -y</span><br></pre></td></tr></table></figure>
-<p>这里的 -y 参数是为了在安装的时候默认选择yes</p>
-<h2 id="3-deb包安装-amp-卸载（需要先下载好）"><a href="#3-deb包安装-amp-卸载（需要先下载好）" class="headerlink" title="3. deb包安装&amp;卸载（需要先下载好）"></a>3. deb包安装&amp;卸载（需要先下载好）</h2><ul>
-<li>安装命令<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo dpkg -i xxx.deb</span><br></pre></td></tr></table></figure></li>
-<li>安装依赖（如果提示需要的话）<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get install -f</span><br></pre></td></tr></table></figure></li>
-<li>自动清除残留配置文件<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get autoclean</span><br><span class="line">sudo apt-get autoremove</span><br></pre></td></tr></table></figure></li>
-<li>完全卸载<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get remove --purge name</span><br></pre></td></tr></table></figure>
-一般来说，这样的卸载会比较干净地卸载掉软件。有些没有办法自动删除的文件，可以手动去删除掉</li>
-</ul>
-<h2 id="4-另一种deb包安装方式"><a href="#4-另一种deb包安装方式" class="headerlink" title="4. 另一种deb包安装方式"></a>4. 另一种deb包安装方式</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># cd到安装包目录</span></span><br><span class="line">sudo apt install ./xxxx.deb</span><br></pre></td></tr></table></figure>
-<h2 id="5-安装filename-tar-gz软件"><a href="#5-安装filename-tar-gz软件" class="headerlink" title="5. 安装filename.tar.gz软件"></a>5. 安装filename.tar.gz软件</h2><ul>
-<li>解压</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tar -xzvf file.tar.gz</span><br></pre></td></tr></table></figure>
-<ul>
-<li>然后在解压目录或者bin文件夹中执行setup.sh文件。。。这个一般不定，安装前最好查一下官网说明</li>
-</ul>
-<h2 id="6-源码安装"><a href="#6-源码安装" class="headerlink" title="6. 源码安装"></a>6. 源码安装</h2><p>有些软件没有被收录进软件镜像源，或者说开发者需要去使用他们最新的版本，这时候就要自己去他们的官网或者是代码托管平台下载最新的Linux源码，自己来build。</p>
-<p>这种方式安装需<strong>要解决很多的依赖</strong>。。。。安装前，多问问度娘，Google</p>
-<p>此处还是以tree为例：</p>
-<ul>
-<li>先去 <a href="http://link.zhihu.com/?target=ftp%3A//mama.indstate.edu/linux/tree/" title="Tree FTP">Tree FTP</a> 下载最新的源码包</li>
-<li>解压</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tar zxf tree-1.7.0.tgz</span><br><span class="line"><span class="built_in">cd</span>  tree-1.7.0/</span><br><span class="line">make and install</span><br><span class="line">sudo make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
-<p><strong>如果没有配置g++环境，先用apt安装build-essential</strong></p>
-<ul>
-<li>OK, 大功告成<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nutao@master:~/Public/tree-1.7.0$ tree</span><br><span class="line">.</span><br><span class="line">├── CHANGES</span><br><span class="line">├── color.c</span><br><span class="line">├── color.o</span><br><span class="line">├── doc</span><br><span class="line">│   ├── tree.1</span><br><span class="line">│   ├── tree.1.fr</span><br><span class="line">│   └── xml.dtd</span><br><span class="line">├── hash.c</span><br><span class="line">├── hash.o</span><br><span class="line">├── html.c</span><br><span class="line">├── html.o</span><br><span class="line">├── INSTALL</span><br><span class="line">├── json.c</span><br><span class="line">├── json.o</span><br><span class="line">├── LICENSE</span><br><span class="line">├── Makefile</span><br><span class="line">├── README</span><br><span class="line">├── strverscmp.c</span><br><span class="line">├── TODO</span><br><span class="line">├── tree</span><br><span class="line">├── tree.c</span><br><span class="line">├── tree.h</span><br><span class="line">├── tree.o</span><br><span class="line">├── unix.c</span><br><span class="line">├── unix.o</span><br><span class="line">├── xml.c</span><br><span class="line">└── xml.o</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h2 id="常用压缩文件的解压命令"><a href="#常用压缩文件的解压命令" class="headerlink" title="常用压缩文件的解压命令"></a>常用压缩文件的解压命令</h2><p>1、<em>.tar 用 tar –xvf 解压<br>2、</em>.gz 用 gzip -d或者gunzip 解压<br>3、.tar.gz和.tgz 用 tar –xzf 解压<br>4、<em>.bz2 用 bzip2 -d或者用bunzip2 解压<br>5、</em>.tar.bz2用tar –xjf 解压<br>6、<em>.Z 用 uncompress 解压<br>7、</em>.tar.Z 用tar –xZf 解压<br>8、<em>.rar 用 unrar e解压<br>9、</em>.zip 用 unzip 解压</p>
-]]></content>
-      <categories>
-        <category>Ubuntu</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>Ubuntu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Ubuntu16.04 Grub Rescue</title>
-    <url>/2017/07/13/Ubuntu16-04-Grub-Rescue/</url>
-    <content><![CDATA[<p>如果某一天, 你不小心扩展了一下你的 / 目录, 又忘记了更新 grub 引导. 不好意思, 你有麻烦了</p>
-<p><img src="/images/1.png" alt="grub"></p>
-<h3 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h3><!-- more  -->
-<h4 id="1-ls-一下所有的盘符"><a href="#1-ls-一下所有的盘符" class="headerlink" title="1. ls 一下所有的盘符"></a>1. ls 一下所有的盘符</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">grub rescue&gt; ls</span><br></pre></td></tr></table></figure>
-<h4 id="2-找-boot-grub的分区"><a href="#2-找-boot-grub的分区" class="headerlink" title="2. 找/boot/grub的分区"></a>2. 找/boot/grub的分区</h4><blockquote>
-<p>如果你的 /boot 没有单独分区, 请执行</p>
-</blockquote>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">grub rescue&gt; ls (hd0,msdosx)/boot/grub</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>如果你的 /boot 单独分区啦, 请执行</p>
-</blockquote>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">grub rescue&gt; ls (hd0,msdosx)/grub</span><br></pre></td></tr></table></figure>
-
-<p>ls出如下的目录, 恭喜你找到 /boot 路径了</p>
-<h4 id="3-修复grub引导"><a href="#3-修复grub引导" class="headerlink" title="3. 修复grub引导"></a>3. 修复grub引导</h4><blockquote>
-<p>假设/boot 在(hd0,msdos3) 中</p>
-</blockquote>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># /boot 单独分区</span><br><span class="line">set root=(hd0,msdos3)</span><br><span class="line">set prefix=(hd0,msdos3)/grub</span><br><span class="line">insmod normal</span><br><span class="line">normal</span><br></pre></td></tr></table></figure>
-
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># /boot 没有单独分区</span><br><span class="line">set root=(hd0,msdos3)</span><br><span class="line">set prefix=(hd0,msdos3)/boot/grub</span><br><span class="line">insmod normal</span><br><span class="line">normal</span><br></pre></td></tr></table></figure>
-<p>正常情况下, 执行完后, 电脑就能开机进入桌面啦<br>然后, 还没有结束. (这时千万不要关机, 否则前面步骤再来一次)<br><strong>在正常进入系统以后…</strong></p>
-<h4 id="4-更新系统-grub-引导"><a href="#4-更新系统-grub-引导" class="headerlink" title="4. 更新系统 grub 引导"></a>4. 更新系统 grub 引导</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo update-grub</span><br><span class="line">sudo update-grub2</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>打印出如下日志(我是双系统)</p>
-</blockquote>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Generating grub configuration file ...</span><br><span class="line">Found linux image: /boot/vmlinuz-4.4.0-66-generic</span><br><span class="line">Found initrd image: /boot/initrd.img-4.4.0-66-generic</span><br><span class="line">Found memtest86+ image: /memtest86+.elf</span><br><span class="line">Found memtest86+ image: /memtest86+.bin</span><br><span class="line">Found Windows 10 (loader) on /dev/sda1</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>然后重新安装grub</p>
-</blockquote>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">nutao@nutao-HP:~$ sudo grub-install /dev/sda</span><br><span class="line"># 日志</span><br><span class="line">Installing for i386-pc platform.</span><br><span class="line">Installation finished. No error reported.</span><br></pre></td></tr></table></figure>
-
-<h4 id="OK-一切搞定"><a href="#OK-一切搞定" class="headerlink" title="OK, 一切搞定"></a>OK, 一切搞定</h4>]]></content>
-      <categories>
-        <category>Ubuntu</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>Ubuntu</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Redis常用数据结构</title>
     <url>/2020/03/15/Redis%E5%B8%B8%E7%94%A8%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</url>
     <content><![CDATA[<p>Redis是一个开源的使用ANSI C语言编写、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库。<br>官方线上Tutoral：<a href="http://try.redis.io/">http://try.redis.io/</a></p>
@@ -1109,6 +1051,160 @@
       </categories>
       <tags>
         <tag>Redis</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Ubuntu 分区（目录）挂载/扩容</title>
+    <url>/2017/07/17/Ubuntu-%E5%88%86%E5%8C%BA%EF%BC%88%E7%9B%AE%E5%BD%95%EF%BC%89%E6%8C%82%E8%BD%BD-%E6%89%A9%E5%AE%B9/</url>
+    <content><![CDATA[<p>这次写的教程是经过我多次验证，用于对Ubuntu分区（目录）操作的一些经验。分享给大家，希望能够有所帮助。</p>
+<p><strong>友善提醒：硬盘操作有风险，请注意备份自己的重要资料。如果不熟练，请在虚拟机上自己多操作几次，再在Server上面操作</strong></p>
+<span id="more"></span>
+
+<h2 id="1-为啥会被分区容量所困扰？"><a href="#1-为啥会被分区容量所困扰？" class="headerlink" title="1.为啥会被分区容量所困扰？"></a>1.为啥会被分区容量所困扰？</h2><p>通常情况下，我们在使用Ubuntu还是没啥大毛病。可是有一天，突然在解开锁屏的时候，突然弹出如下警告。。。</p>
+<p><img src="https://pic3.zhimg.com/v2-88408a07f66d85e07a333c6e22c881ea_b.png" alt="磁盘空间不足提示"></p>
+<p>系统磁盘容量不足！！！这个时候就有点烦心了。左思右想，有如下几种应急方法（欢迎添加）</p>
+<ul>
+<li>先去删一波 /tmp, /var/cache/apt/archives下面的临时文件， 删掉不用的软件和遗留的目录、日志</li>
+<li>autoremove, autoclean 删掉多余的 lib</li>
+<li>删掉/home下面多余的文档</li>
+<li>添加新的硬盘<br>前三种方法都是暂时性的应急，不是长久之计。而且，当你的硬盘里面存了大量的重要的资料的时候（譬如用户的数据，重要的数据文件等），这个时候就不得不采用第四种方案了。</li>
+</ul>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><blockquote>
+<p>将新的硬盘挂载到需要添加存储介质的目录下（根据实际需要）</p>
+</blockquote>
+<h2 id="1-查看磁盘信息"><a href="#1-查看磁盘信息" class="headerlink" title="1. 查看磁盘信息"></a>1. 查看磁盘信息</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo fdisk -l</span><br></pre></td></tr></table></figure>
+<p><img src="/2017/07/17/Ubuntu-%E5%88%86%E5%8C%BA%EF%BC%88%E7%9B%AE%E5%BD%95%EF%BC%89%E6%8C%82%E8%BD%BD-%E6%89%A9%E5%AE%B9/1.png" alt="磁盘信息"></p>
+<p>作为测试，我选取 /dev/sda5, 想要将其挂载到 /home/nutao/disk/D 下面</p>
+<p>查看硬盘使用情况用如下命令：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">df</span> -kh</span><br></pre></td></tr></table></figure>
+<h2 id="2-查看硬盘-UUID-和-磁盘类型"><a href="#2-查看硬盘-UUID-和-磁盘类型" class="headerlink" title="2. 查看硬盘 UUID 和 磁盘类型"></a>2. 查看硬盘 UUID 和 磁盘类型</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo blkid</span><br></pre></td></tr></table></figure>
+<p><img src="/2017/07/17/Ubuntu-%E5%88%86%E5%8C%BA%EF%BC%88%E7%9B%AE%E5%BD%95%EF%BC%89%E6%8C%82%E8%BD%BD-%E6%89%A9%E5%AE%B9/2.png" alt="UUID"></p>
+<p>用记事本或者其他工具记录下 /dev/sda5 的UUID和分区格式（建议将新的硬盘分区为ext4）</p>
+<h2 id="3-取消挂载目标盘"><a href="#3-取消挂载目标盘" class="headerlink" title="3. 取消挂载目标盘"></a>3. 取消挂载目标盘</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo umount /dev/sda5</span><br></pre></td></tr></table></figure>
+<h2 id="4-编辑-etc-fstab-文件"><a href="#4-编辑-etc-fstab-文件" class="headerlink" title="4. 编辑 /etc/fstab 文件"></a>4. 编辑 /etc/fstab 文件</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo vi /etc/fstab</span><br></pre></td></tr></table></figure>
+<p>追加一行内容</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">UUID=0008DCD1000EA709 /home/nutao/disk/D    ntfs    defaults    0   2</span><br></pre></td></tr></table></figure>
+<p>其中第一列为UUID, 第二列为挂载目录（该目录必须为空目录），第三列为文件系统类型，第四列为参数，第五列0表示不备份，最后一列必须为２或0(除非引导分区为1)</p>
+<h2 id="5-更新引导（千万记得更新，否则重启会出错）"><a href="#5-更新引导（千万记得更新，否则重启会出错）" class="headerlink" title="5. 更新引导（千万记得更新，否则重启会出错）"></a>5. 更新引导（千万记得更新，否则重启会出错）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo update-grub</span><br><span class="line">sudo update-grub2</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="Linux下分区工具-gparted"><a href="#Linux下分区工具-gparted" class="headerlink" title="Linux下分区工具 gparted"></a>Linux下分区工具 gparted</h2><p>安装命令</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Debian</span></span><br><span class="line">sudo apt-get install gparted</span><br><span class="line"></span><br><span class="line"><span class="comment"># Fedora</span></span><br><span class="line">su -c <span class="string">&quot;yum install gparted&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># OpenSUSE</span></span><br><span class="line">sudo zypper install gparted</span><br><span class="line"></span><br><span class="line"><span class="comment"># Ubuntu</span></span><br><span class="line">sudo apt-get install gparted</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>Ubuntu</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Ubuntu 换源，安装&amp;卸载软件</title>
+    <url>/2017/07/17/Ubuntu-%E6%8D%A2%E6%BA%90%EF%BC%8C%E5%AE%89%E8%A3%85-%E5%8D%B8%E8%BD%BD%E8%BD%AF%E4%BB%B6/</url>
+    <content><![CDATA[<p>国内的筒子们，经常发现在update的时候各种卡。。。有时候心情好，等等也就罢了。万一某一天急着安装软件，那种状态下，真的是多等一秒感觉都是心烦气躁的。所以，本文就来跟大家聊聊在Ubuntu 中换源，安装&amp;卸载软件的那些事，欢迎各位一起交流。。。<br><img src="/images/ubuntu16.04.png" alt="Ubuntu16.04"></p>
+<span id="more"></span>
+<h2 id="1-查找国内的开源镜像提供的源地址"><a href="#1-查找国内的开源镜像提供的源地址" class="headerlink" title="1. 查找国内的开源镜像提供的源地址"></a>1. 查找国内的开源镜像提供的源地址</h2><blockquote>
+<p>Ubuntu的源的list文件位于 <code>/etc/apt/sources.list</code></p>
+</blockquote>
+<ul>
+<li>高校镜像源（国内其他大学也有提供，可自行查找）<br><a href="http://link.zhihu.com/?target=https%3A//mirrors.tuna.tsinghua.edu.cn/help/ubuntu/" title="清华大学开源镜像站">清华大学开源镜像站 </a><br><a href="http://link.zhihu.com/?target=https%3A//mirrors.ustc.edu.cn/repogen/" title="中科大开源镜像站">中科大开源镜像站</a></li>
+</ul>
+<ul>
+<li>企业镜像源（其他企业的请自行查找）<br><a href="http://link.zhihu.com/?target=http%3A//mirrors.aliyun.com/help/ubuntu" title="阿里云开源镜像站">阿里云开源镜像站 </a><br><a href="http://link.zhihu.com/?target=http%3A//mirrors.163.com/.help/ubuntu.html" title="网易开源镜像站">网易开源镜像站</a></li>
+</ul>
+<p><strong>这里以清华源为例</strong></p>
+<p>先去查一下清华源的帮助文档，戳 <a href="http://link.zhihu.com/?target=https%3A//mirrors.tuna.tsinghua.edu.cn/help/ubuntu/" title="清华大学开源镜像站">清华大学开源镜像站 </a>，选择相匹配的Ubuntu的版本，会得到软件源镜像的地址。</p>
+<p>接下来直接替换一下系统的source.list文件<del>~</del></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 备份一下</span></span><br><span class="line">sudo <span class="built_in">cp</span> /etc/apt/sources.list /etc/apt/sources.list.bak</span><br><span class="line"><span class="comment"># 修改</span></span><br><span class="line">sudo vi /etc/apt/sources.list</span><br></pre></td></tr></table></figure>
+<p>将文档里面所有的内容删除，然后替换为清华镜像提供的软件源镜像的地址。<br>例如我用的 16.04 版， 替换为：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse</span></span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted universe multiverse</span><br><span class="line"><span class="comment"># deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted universe multiverse</span></span><br></pre></td></tr></table></figure>
+<p>然后再update一下，你会发现速度还是有明显的提升的。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt update</span><br></pre></td></tr></table></figure>
+<h2 id="2-使用apt安装软件"><a href="#2-使用apt安装软件" class="headerlink" title="2. 使用apt安装软件"></a>2. 使用apt安装软件</h2><p>这个就不多说了，比较简单，譬如安装tree</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt install tree -y</span><br></pre></td></tr></table></figure>
+<p>这里的 -y 参数是为了在安装的时候默认选择yes</p>
+<h2 id="3-deb包安装-amp-卸载（需要先下载好）"><a href="#3-deb包安装-amp-卸载（需要先下载好）" class="headerlink" title="3. deb包安装&amp;卸载（需要先下载好）"></a>3. deb包安装&amp;卸载（需要先下载好）</h2><ul>
+<li>安装命令<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo dpkg -i xxx.deb</span><br></pre></td></tr></table></figure></li>
+<li>安装依赖（如果提示需要的话）<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get install -f</span><br></pre></td></tr></table></figure></li>
+<li>自动清除残留配置文件<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get autoclean</span><br><span class="line">sudo apt-get autoremove</span><br></pre></td></tr></table></figure></li>
+<li>完全卸载<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get remove --purge name</span><br></pre></td></tr></table></figure>
+一般来说，这样的卸载会比较干净地卸载掉软件。有些没有办法自动删除的文件，可以手动去删除掉</li>
+</ul>
+<h2 id="4-另一种deb包安装方式"><a href="#4-另一种deb包安装方式" class="headerlink" title="4. 另一种deb包安装方式"></a>4. 另一种deb包安装方式</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># cd到安装包目录</span></span><br><span class="line">sudo apt install ./xxxx.deb</span><br></pre></td></tr></table></figure>
+<h2 id="5-安装filename-tar-gz软件"><a href="#5-安装filename-tar-gz软件" class="headerlink" title="5. 安装filename.tar.gz软件"></a>5. 安装filename.tar.gz软件</h2><ul>
+<li>解压</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tar -xzvf file.tar.gz</span><br></pre></td></tr></table></figure>
+<ul>
+<li>然后在解压目录或者bin文件夹中执行setup.sh文件。。。这个一般不定，安装前最好查一下官网说明</li>
+</ul>
+<h2 id="6-源码安装"><a href="#6-源码安装" class="headerlink" title="6. 源码安装"></a>6. 源码安装</h2><p>有些软件没有被收录进软件镜像源，或者说开发者需要去使用他们最新的版本，这时候就要自己去他们的官网或者是代码托管平台下载最新的Linux源码，自己来build。</p>
+<p>这种方式安装需<strong>要解决很多的依赖</strong>。。。。安装前，多问问度娘，Google</p>
+<p>此处还是以tree为例：</p>
+<ul>
+<li>先去 <a href="http://link.zhihu.com/?target=ftp%3A//mama.indstate.edu/linux/tree/" title="Tree FTP">Tree FTP</a> 下载最新的源码包</li>
+<li>解压</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tar zxf tree-1.7.0.tgz</span><br><span class="line"><span class="built_in">cd</span>  tree-1.7.0/</span><br><span class="line">make and install</span><br><span class="line">sudo make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
+<p><strong>如果没有配置g++环境，先用apt安装build-essential</strong></p>
+<ul>
+<li>OK, 大功告成<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nutao@master:~/Public/tree-1.7.0$ tree</span><br><span class="line">.</span><br><span class="line">├── CHANGES</span><br><span class="line">├── color.c</span><br><span class="line">├── color.o</span><br><span class="line">├── doc</span><br><span class="line">│   ├── tree.1</span><br><span class="line">│   ├── tree.1.fr</span><br><span class="line">│   └── xml.dtd</span><br><span class="line">├── hash.c</span><br><span class="line">├── hash.o</span><br><span class="line">├── html.c</span><br><span class="line">├── html.o</span><br><span class="line">├── INSTALL</span><br><span class="line">├── json.c</span><br><span class="line">├── json.o</span><br><span class="line">├── LICENSE</span><br><span class="line">├── Makefile</span><br><span class="line">├── README</span><br><span class="line">├── strverscmp.c</span><br><span class="line">├── TODO</span><br><span class="line">├── tree</span><br><span class="line">├── tree.c</span><br><span class="line">├── tree.h</span><br><span class="line">├── tree.o</span><br><span class="line">├── unix.c</span><br><span class="line">├── unix.o</span><br><span class="line">├── xml.c</span><br><span class="line">└── xml.o</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="常用压缩文件的解压命令"><a href="#常用压缩文件的解压命令" class="headerlink" title="常用压缩文件的解压命令"></a>常用压缩文件的解压命令</h2><p>1、<em>.tar 用 tar –xvf 解压<br>2、</em>.gz 用 gzip -d或者gunzip 解压<br>3、.tar.gz和.tgz 用 tar –xzf 解压<br>4、<em>.bz2 用 bzip2 -d或者用bunzip2 解压<br>5、</em>.tar.bz2用tar –xjf 解压<br>6、<em>.Z 用 uncompress 解压<br>7、</em>.tar.Z 用tar –xZf 解压<br>8、<em>.rar 用 unrar e解压<br>9、</em>.zip 用 unzip 解压</p>
+]]></content>
+      <categories>
+        <category>Ubuntu</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Ubuntu16.04 Grub Rescue</title>
+    <url>/2017/07/13/Ubuntu16-04-Grub-Rescue/</url>
+    <content><![CDATA[<p>如果某一天, 你不小心扩展了一下你的 / 目录, 又忘记了更新 grub 引导. 不好意思, 你有麻烦了</p>
+<p><img src="/images/1.png" alt="grub"></p>
+<h3 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h3><!-- more  -->
+<h4 id="1-ls-一下所有的盘符"><a href="#1-ls-一下所有的盘符" class="headerlink" title="1. ls 一下所有的盘符"></a>1. ls 一下所有的盘符</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">grub rescue&gt; ls</span><br></pre></td></tr></table></figure>
+<h4 id="2-找-boot-grub的分区"><a href="#2-找-boot-grub的分区" class="headerlink" title="2. 找/boot/grub的分区"></a>2. 找/boot/grub的分区</h4><blockquote>
+<p>如果你的 /boot 没有单独分区, 请执行</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">grub rescue&gt; ls (hd0,msdosx)/boot/grub</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果你的 /boot 单独分区啦, 请执行</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">grub rescue&gt; ls (hd0,msdosx)/grub</span><br></pre></td></tr></table></figure>
+
+<p>ls出如下的目录, 恭喜你找到 /boot 路径了</p>
+<h4 id="3-修复grub引导"><a href="#3-修复grub引导" class="headerlink" title="3. 修复grub引导"></a>3. 修复grub引导</h4><blockquote>
+<p>假设/boot 在(hd0,msdos3) 中</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># /boot 单独分区</span><br><span class="line">set root=(hd0,msdos3)</span><br><span class="line">set prefix=(hd0,msdos3)/grub</span><br><span class="line">insmod normal</span><br><span class="line">normal</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># /boot 没有单独分区</span><br><span class="line">set root=(hd0,msdos3)</span><br><span class="line">set prefix=(hd0,msdos3)/boot/grub</span><br><span class="line">insmod normal</span><br><span class="line">normal</span><br></pre></td></tr></table></figure>
+<p>正常情况下, 执行完后, 电脑就能开机进入桌面啦<br>然后, 还没有结束. (这时千万不要关机, 否则前面步骤再来一次)<br><strong>在正常进入系统以后…</strong></p>
+<h4 id="4-更新系统-grub-引导"><a href="#4-更新系统-grub-引导" class="headerlink" title="4. 更新系统 grub 引导"></a>4. 更新系统 grub 引导</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo update-grub</span><br><span class="line">sudo update-grub2</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>打印出如下日志(我是双系统)</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Generating grub configuration file ...</span><br><span class="line">Found linux image: /boot/vmlinuz-4.4.0-66-generic</span><br><span class="line">Found initrd image: /boot/initrd.img-4.4.0-66-generic</span><br><span class="line">Found memtest86+ image: /memtest86+.elf</span><br><span class="line">Found memtest86+ image: /memtest86+.bin</span><br><span class="line">Found Windows 10 (loader) on /dev/sda1</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>然后重新安装grub</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">nutao@nutao-HP:~$ sudo grub-install /dev/sda</span><br><span class="line"># 日志</span><br><span class="line">Installing for i386-pc platform.</span><br><span class="line">Installation finished. No error reported.</span><br></pre></td></tr></table></figure>
+
+<h4 id="OK-一切搞定"><a href="#OK-一切搞定" class="headerlink" title="OK, 一切搞定"></a>OK, 一切搞定</h4>]]></content>
+      <categories>
+        <category>Ubuntu</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Ubuntu</tag>
       </tags>
   </entry>
   <entry>
