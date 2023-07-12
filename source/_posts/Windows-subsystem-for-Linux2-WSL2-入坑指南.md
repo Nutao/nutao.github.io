@@ -10,6 +10,8 @@ categories:
     - WSL2
 ---
 
+> 本文已投稿至公众号CodeShow，欢迎关注交流容器与云原生技术
+
 ![WSL2](./Windows-subsystem-for-Linux2-WSL2-入坑指南/WSL2.png)
 
 WSL 2 是适用于 Linux 的 Windows 子系统体系结构的一个新版本，它支持适用于 Linux 的 Windows 子系统在 Windows 上运行 ELF64 Linux 二进制文件。相比于WSL1，WSL2 使用的是全新的体系结构，能够通过子系统方式运行**真正的 Linux内核**。
@@ -110,3 +112,6 @@ wsl --list -v
 2. 开启WSL子系统图形界面，IDE跑起来。
 3. 在windows11上使用Docker，打通Windows与WSL的开发部署流程。
 4. 在WSL中使用主机的GPU跑机器学习任务。
+
+> 一起探讨更多的技术细节，试试关注公众号CodeShow
+![wechat](./Docker%E5%85%A5%E9%97%A8%E4%B8%80/CodeShowWechat_End.png)

@@ -8,6 +8,8 @@ categories:
     - Docker
 ---
 
+> 本文已投稿至公众号CodeShow，欢迎关注交流容器与云原生技术
+
 Docker利用Linux的资源隔离机制（容器化），允许用户将**应用本身及运行所需要的全部环境依赖**封装在image镜像中，并可以通过镜像仓库来**分发标准化的部署制品**，所有获取到制品的人通过Docker部署都将能够**获得一致的部署结果**。
 
 ![docker-architecture](./Docker入门一/docker-architecture.svg)
