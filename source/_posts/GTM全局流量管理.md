@@ -10,29 +10,41 @@ categories:
 [toc]
 
 > 本文已投稿至公众号CodeShow，欢迎关注交流容器与云原生技术
-## 一、GTM简介
+## 一、GTM简介 (Introduction)
 
-GTM（Global Traffic Manager，全局流量管理），是一种基于DNS和分布式健康监测体系，保障应用服务高可用、高连续性的流量调度服务。基于GTM的智能DNS解析策略，企业可以实现应用服务的就近接入、高并发LoadBalancer、灵活的HealthCheck，并能够根据健康检查结果实现故障隔离和流量切换，方便企业快速构建同城多活和异地容灾服务。
-
+GTM（Global Traffic Manager，全局流量管理），是一种基于DNS和分布式健康监测体系，保障应用服务高可用、高连续性的流量调度服务。基于GTM的智能DNS解析策略，企业可以实现应用服务的就近接入、高并发LoadBalancer、灵活的HealthCheck，并能够根据健康检查结果实现故障隔离和流量切换。方便企业快速构建同城多活和异地容灾服务。
 
 <!-- more -->
 
-## 二、GTM原理
+Global Traffic Manager (GTM) is a traffic scheduling service based on DNS and distributed health monitoring system to ensure high availability and continuity of application services.Based on the GTM intelligent DNS resolution policy, enterprises can implement nearby access to application services, highly concurrent LoadBalancer, flexible HealthCheck, fault isolation, and traffic switchover based on health check results. It is convenient for enterprises to quickly build HA services among serveral data centers.
+
+## 二、GTM原理 (Technical principle)
 
 通常，访问某个网站（如a.com）时，DNS服务器会根据DNS Server的记录信息，返回准确的IP地址，然后由客户端去访问到服务实际的IP。假设a.com的域名DNS记录在企业自行维护的DNS Server上，那一个典型的DNS查询（首次）流程如下：
+
+Usually, when you access a website (such as a.com), the DNS Server returns the exact IP address according to the recorded information of the DNS server, and then the client accesses the actual IP address of the service. Assuming that the domain name DNS of a.com is recorded on the DNS Server maintained by the enterprise itself, the typical DNS query (first time) process is as follows:
 
 ![DNS查询流程](./GTM全局流量管理/DNS1.PNG)
 
 GTM属于增强的DNS服务，在配置GTM时，通常需要分配一个CNAME接入域名。企业内将实际的业务入口地址CNAME至该接入域名进行全局的负载接管，实现跨数据中心级别的容灾。增加GTM服务后，GTM会根据CNAME实际绑定的A记录和延时，返回最优的解析结果，具体流程见下图：
 
+GTM is an enhanced DNS service. When configuring GTM, you need to assign a CNAME access domain name. The actual service entry address will be taken over by CNAME record to ensure cross-data center disaster recovery. When the GTM service is added, GTM will return the optimal result according to the actual A record and delay bound by CNAME. For details, see the following figure:
+
 ![DNS查询流程](./GTM全局流量管理/DNS2.PNG)
 
 - Health Check模块：用于定期对数据中心的地址发起健康探测，在公有云中，发起探测的客户端可能来自全国多个地区，以确认线路正常可用。大多数GTM服务提供ping、tcp、http三种协议的健康探测。
+
+  The Health Check module is used to periodically launch health checks on data center addresses. In the public cloud, the clients that launch the checks may come from multiple regions of the country to confirm that service is available. GTM services provide health detection for ping, tcp, and http.
+
 - DNS模块：用于记录CNAME和实际的域名地址。与普通DNS不同的是，GTM中该模块同一个域名可以同时配置多个地址，以便在健康探测后可以随时摘除异常地址。同时，在负载均衡策略上，GTM设备大多支持常见的负载均衡策略，如轮询、加权轮询、源地址哈希、最小连接数等。同时也支持**基于IP位置和最小延时**等就近解析策略。
 
-## 三、使用场景及策略配置
+  The DNS module is used to record actual domain and CNAME. Unlike normal DNS, this module in GTM can configure multiple addresses for the same domain at the same time, so that abnormal addresses can be removed at any time after health detection. Meanwhile, in terms of load balancing strategies, GTM devices support common load balancing strategies, such as polling, weighted polling, source address hashing, and minimum number of connections. It also supports nearest resolution policies such as IP location and minimum latency.
+
+## 三、使用场景及策略配置(Scenarios and Strategies)
 
 基于GTM的配置，流量调度可以支持如下场景：
+
+Based on GTM configuration, traffic scheduling can support the following scenarios:
 
 - 基于权重的同城多活
 - 同城双机房主备
